@@ -108,17 +108,15 @@
     <ClInclude Include="TimeManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ground.x" />
-    <None Include="light.x" />
-    <None Include="pyramid.x" />
-    <None Include="sphere.x" />
-    <None Include="teapot.x" />
-    <None Include="twist.x" />
-  </ItemGroup>
-  <ItemGroup>
     <FxCompile Include="shadowEffect.fx">
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">depthMap_VS</EntryPointName>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ground.x" />
+    <None Include="light.x" />
+    <None Include="sphere.x" />
+    <None Include="teapot.x" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

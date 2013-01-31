@@ -1,17 +1,16 @@
 #include "Mesh.h"
 
-Mesh::Mesh(LPDIRECT3DDEVICE9 inDevice, D3DXVECTOR3& inPosition, std::string inMeshFileName)
+Mesh::Mesh(LPDIRECT3DDEVICE9 device, D3DXVECTOR3& position, std::string meshFileName)
 {
-	_pd3dDevice = inDevice;
+	_pd3dDevice = device;
 	D3DXMatrixIdentity(&_worldMatrix);
-	D3DXMatrixTranslation(&_worldMatrix, inPosition.x, inPosition.y, inPosition.z);
-	_meshFileName = inMeshFileName;
+	D3DXMatrixTranslation(&_worldMatrix, position.x, position.y, position.z);
+	_meshFileName = meshFileName;
 	_pMesh = NULL;
 }
 
 Mesh::~Mesh()
 {
-
 }
 
 D3DXMATRIXA16* Mesh::GetWorldMat()
@@ -27,54 +26,38 @@ void Mesh::Translate(float inX, float inY, float inZ)
 
 bool Mesh::Load()
 {
-	if( FAILED( D3DXLoadMeshFromX( _meshFileName.c_str(), 
-		D3DXMESH_MANAGED, 
-		_pd3dDevice, 
-		NULL, 
-		NULL, 
-		NULL, 
-		&_numMaterials, 
-		&_pMesh ) ) )
+	if( FAILED( D3DXLoadMeshFromX( _meshFileName.c_str(), D3DXMESH_MANAGED,	_pd3dDevice, NULL, NULL, NULL, &_numMaterials, &_pMesh)))
 	{
-
-		if( FAILED( D3DXLoadMeshFromX( _meshFileName.c_str(), 
-			D3DXMESH_MANAGED,
-			_pd3dDevice, 
-			NULL, 
-			NULL,
-			NULL, 
-			&_numMaterials, 
-			&_pMesh ) ) )
+		if( FAILED( D3DXLoadMeshFromX( _meshFileName.c_str(), D3DXMESH_MANAGED,	_pd3dDevice, NULL, NULL, NULL, &_numMaterials, &_pMesh)))
 		{
 			return false;
 		}
 	}
-
 	return true;
 }
 
-void Mesh::RenderAmbient(D3DXMATRIXA16* inViewProjMat, ShadowEffect* inShadowMapper)
+void Mesh::RenderAmbient(D3DXMATRIXA16* viewProjectionMatrix, ShadowEffect* shadowMapper)
 {
 	D3DXMATRIXA16 worldViewProjMat;
-	D3DXMatrixMultiply(&worldViewProjMat, &_worldMatrix, inViewProjMat);
-	inShadowMapper->_pEffect->SetMatrix(inShadowMapper->_worldViewProjMatHandle, &worldViewProjMat);
+	D3DXMatrixMultiply(&worldViewProjMat, &_worldMatrix, viewProjectionMatrix);
+	shadowMapper->_pEffect->SetMatrix(shadowMapper->_worldViewProjMatHandle, &worldViewProjMat);
 
-	inShadowMapper->_pEffect->BeginPass(0);
+	shadowMapper->_pEffect->BeginPass(0);
 	_pMesh->DrawSubset(0);
-	inShadowMapper->_pEffect->EndPass();
+	shadowMapper->_pEffect->EndPass();
 }
 
-void Mesh::RenderMeshWithShadowCube(D3DXMATRIXA16* inViewProjMat, ShadowEffect* inShadowMapper)
+void Mesh::RenderMeshWithShadowCube(D3DXMATRIXA16* viewProjectionMatrix, ShadowEffect* shadowMapper)
 {
 	D3DXMATRIXA16 worldViewProjMat;
-	D3DXMatrixMultiply(&worldViewProjMat, &_worldMatrix, inViewProjMat);
+	D3DXMatrixMultiply(&worldViewProjMat, &_worldMatrix, viewProjectionMatrix);
 
-	inShadowMapper->_pEffect->SetMatrix(inShadowMapper->_worldViewProjMatHandle, &worldViewProjMat);
-	inShadowMapper->_pEffect->SetMatrix(inShadowMapper->_worldMatHandle, &_worldMatrix);
+	shadowMapper->_pEffect->SetMatrix(shadowMapper->_worldViewProjMatHandle, &worldViewProjMat);
+	shadowMapper->_pEffect->SetMatrix(shadowMapper->_worldMatHandle, &_worldMatrix);
 
-	inShadowMapper->_pEffect->BeginPass(0);
+	shadowMapper->_pEffect->BeginPass(0);
 	_pMesh->DrawSubset(0);
-	inShadowMapper->_pEffect->EndPass();
+	shadowMapper->_pEffect->EndPass();
 }
 
 void Mesh::CleanUp()

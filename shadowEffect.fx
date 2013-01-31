@@ -9,7 +9,7 @@ const float4 globalAmbient = float4(1.0f, 1.0f, 1.0f, 1.0f);
 
 const float4 lightDiffuse = float4(0.5f, 0.5f, 0.5f, 1.0f);
 const float4 lightSpecular = float4(0.5f, 0.5f, 0.5f, 1.0f);
-const float4 lightAttenuation = float4(0.0f, 0.1f, 0.0f, 1.0f);
+const float4 lightAttenuation = float4(0.0f, 0.05f, 0.0f, 1.0f);
 
 const float specPower = 64.0f;
 
@@ -131,7 +131,7 @@ float4 cubicShadowMapping_PS(VS_OUTPUT In) : COLOR0
     float3 normal = normalize(In.normalW);
     float3 cam2Vert = normalize(In.cam2Vert);
     
-    lightResult = LightPointSH(In.worldPos, normal, cam2Vert); //perform lighting/shadowing calculations
+    lightResult = LightPointSH(In.worldPos, normal, cam2Vert);
     
     float4 ambient = materialAmbient * globalAmbient;
     float4 diffuse = materialDiffuse * lightResult.diffuseResult;
@@ -144,7 +144,8 @@ float4 cubicShadowMapping_PS(VS_OUTPUT In) : COLOR0
 
 float4 ambient_PS(float4 posWVP : POSITION) : COLOR0
 {
-	return float4(1.0f, 0.75f, 0.345f, 1.0f); 
+	//light model colour
+	return float4(1.0f, 1.0f, 1.0f, 1.0f); 
 }
 
 technique depthMap

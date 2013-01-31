@@ -35,6 +35,8 @@ class Environment
 	D3DXVECTOR3 _negativeLookY;
 	D3DXVECTOR3 _negativeLookZ;
 
+	float _lightMoveSpeed;
+
 	void CreateCamForPositiveX();
 	void CreateCamForNegativeX();
 	void CreateCamForPositiveY();

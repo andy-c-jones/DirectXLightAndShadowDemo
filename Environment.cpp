@@ -23,6 +23,7 @@ Environment::Environment()
 	_depthCubeFaceNX = NULL;
 	_depthCubeFaceNY = NULL;
 	_depthCubeFaceNZ = NULL;
+	_lightMoveSpeed = 0.01f;
 }
 
 Environment::~Environment()
@@ -92,9 +93,9 @@ bool Environment::InitialiseDirectX( HWND hWnd, UINT screenWidth, UINT screenHei
 	return true;
 }
 
-bool Environment::Initialise( HWND hWnd, HINSTANCE inInstance, UINT inScreenWidth, UINT inScreenHeight, BOOL inWindowed )
+bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, UINT screenHeight, BOOL windowed )
 {
-	if( !(InitialiseDirectX(hWnd, inScreenWidth, inScreenHeight, inWindowed)) )
+	if( !(InitialiseDirectX(hWnd, screenWidth, screenHeight, windowed)) )
 	{
 		MessageBoxA(NULL, "Direct3d initialization failed.", NULL, MB_OK);
 		return false;
@@ -151,23 +152,21 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE inInstance, UINT inScreenWidt
 	}
 
 	_pInput = new CInput();
-	if( !(_pInput->Initialise(hWnd, inInstance)) )
+	if( !(_pInput->Initialise(hWnd, instance)) )
 	{
 		MessageBoxA(NULL, "Direct Input initialization failed.", "BOOM!", MB_OK);
 		return false;
 	}
 
 	D3DXVECTOR3 initialCamPos = D3DXVECTOR3(0.0f, 30.0f, 0.0f);
-	_pMainCamera = new MainCamera(&initialCamPos, D3DX_PI / 2.0f, ((float)inScreenWidth / (float)inScreenHeight), 
+	_pMainCamera = new MainCamera(&initialCamPos, D3DX_PI / 2.0f, ((float)screenWidth / (float)screenHeight), 
 									1.0f, 500.0f, 20.0f, _pInput);
 
 	_pLightCamera = new Camera(&initialCamPos, (D3DX_PI / 2.0f), 1.0f, 1.0f, 500.0f);
 
-	D3DXVECTOR3 teapotPos = D3DXVECTOR3(-30.0f, 0.0f, 30.0f);
-	D3DXVECTOR3 pyrimidPos = D3DXVECTOR3(30.0f, 0.0f, 30.0f);
-	D3DXVECTOR3 spherePos = D3DXVECTOR3(-30.0f, 10.0f, -30.0f);
+	D3DXVECTOR3 teapotPos = D3DXVECTOR3(0.0f, 0.0f, 30.0f);
+	D3DXVECTOR3 spherePos = D3DXVECTOR3(0.0f, 10.0f, 50.0f);
 	D3DXVECTOR3 groundPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	D3DXVECTOR3 twistPos = D3DXVECTOR3(30.0f, 0.0f, -30.0f);
 	D3DXVECTOR3 lightPos = D3DXVECTOR3(0.0f, 20.0f, 0.0f);
 
 	_pTeapot = new Mesh(_pd3dDevice, teapotPos, "teapot.x");
@@ -204,7 +203,7 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE inInstance, UINT inScreenWidt
 	_negativeLookY = D3DXVECTOR3(0.0f, -1.0f, 0.0f);
 	_negativeLookZ = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
 
-	_lightPosition = D3DXVECTOR3(0.0f, 20.0f, 0.0f);
+	_lightPosition = lightPos;
 
 	return true;
 }
@@ -268,18 +267,23 @@ void Environment::OnFrameMove(DWORD inTimeDelta)
 	_pInput->GetInputData();
 	_pMainCamera->UpdateCamera((float)(inTimeDelta / 1000.0f));
 
+	if (_lightPosition.x > 75 || _lightPosition.x < -75)
+	{
+		_lightMoveSpeed = -_lightMoveSpeed;
+	}
+
+	_lightPosition.x += _lightMoveSpeed;
+
 	_pShadowEffect->_pEffect->SetVector(_pShadowEffect->_lightPositionHandle, &D3DXVECTOR4(_lightPosition, 1.0f));
 	_pLightCamera->SetPosition(&_lightPosition);
 	_pLight->Translate(_lightPosition.x, _lightPosition.y, _lightPosition.z);
 
-	//set eye position in effect
 	_pShadowEffect->_pEffect->SetVector(_pShadowEffect->_eyePositionHandle, _pMainCamera->GetPosition4());
 }
 
 void Environment::RenderDepthToCubeFace(LPDIRECT3DSURFACE9 cubeFaceSurface)
 {
 	D3DXMATRIXA16 worldViewProjectionMatrix;
-	//set and clear the cube map face surface
 	if(SUCCEEDED(_pd3dDevice->SetRenderTarget( 0, cubeFaceSurface )))
 	{
 		_pd3dDevice->Clear(NULL, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00000000, 1.0f, NULL);
@@ -288,7 +292,7 @@ void Environment::RenderDepthToCubeFace(LPDIRECT3DSURFACE9 cubeFaceSurface)
 	{
 		return;
 	}
-	//render the ground
+
 	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pGround->GetWorldMat(), _pLightCamera->GetViewProjectionMatrix());
 	_pShadowEffect->_pEffect->SetMatrix(_pShadowEffect->_worldMatHandle, _pGround->GetWorldMat());
 	_pShadowEffect->_pEffect->SetMatrix(_pShadowEffect->_worldViewProjMatHandle, &worldViewProjectionMatrix);
@@ -297,7 +301,6 @@ void Environment::RenderDepthToCubeFace(LPDIRECT3DSURFACE9 cubeFaceSurface)
 	_pGround->_pMesh->DrawSubset(0);
 	_pShadowEffect->_pEffect->EndPass();
 
-	//render the teapot
 	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pTeapot->GetWorldMat(), _pLightCamera->GetViewProjectionMatrix());
 	_pShadowEffect->_pEffect->SetMatrix(_pShadowEffect->_worldMatHandle, _pTeapot->GetWorldMat());
 	_pShadowEffect->_pEffect->SetMatrix(_pShadowEffect->_worldViewProjMatHandle, &worldViewProjectionMatrix);
@@ -306,7 +309,6 @@ void Environment::RenderDepthToCubeFace(LPDIRECT3DSURFACE9 cubeFaceSurface)
 	_pTeapot->_pMesh->DrawSubset(0);
 	_pShadowEffect->_pEffect->EndPass();
 
-	//render the sphere
 	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pSphere->GetWorldMat(), _pLightCamera->GetViewProjectionMatrix());
 	_pShadowEffect->_pEffect->SetMatrix(_pShadowEffect->_worldMatHandle, _pSphere->GetWorldMat());
 	_pShadowEffect->_pEffect->SetMatrix(_pShadowEffect->_worldViewProjMatHandle, &worldViewProjectionMatrix);
@@ -355,7 +357,7 @@ void Environment::FillCubicShadowMap()
 
 	_pShadowEffect->_pEffect->End();
 
-	//enable colour writes, for the next step uses it
+	//enable colour writes, next step uses it
 	if( FAILED(_pd3dDevice->SetRenderState(D3DRS_COLORWRITEENABLE, 
 		D3DCOLORWRITEENABLE_ALPHA | 
 		D3DCOLORWRITEENABLE_RED | 
@@ -375,7 +377,7 @@ void Environment::RenderSceneWithShadowMap()
 		_pd3dDevice->Clear(NULL, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00000000, 1.0f, NULL);
 	}
 
-	//set the cubic shadow map in effect
+	//set the shadow map in effect
 	_pShadowEffect->_pEffect->SetTexture(_pShadowEffect->_cubeShadowMapHandle, _cubicShadowMap);
 	_pShadowEffect->_pEffect->SetTechnique(_pShadowEffect->_cubicShadowMappingHandle);
 
