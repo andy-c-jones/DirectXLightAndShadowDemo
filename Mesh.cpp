@@ -1,6 +1,6 @@
 #include "Mesh.h"
 
-Mesh::Mesh(LPDIRECT3DDEVICE9 device, D3DXVECTOR3& position, std::string meshFileName)
+Mesh::Mesh(IDirect3DDevice9* device, D3DXVECTOR3& position, std::string meshFileName)
 {
 	_pd3dDevice = device;
 	D3DXMatrixIdentity(&_worldMatrix);

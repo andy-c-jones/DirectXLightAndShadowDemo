@@ -1,6 +1,5 @@
 #include <Windows.h>
 #include <mmsystem.h>
-#include <d3dx10.h>
 #include ".\Environment.h"
 #include ".\timeManager.h"
 

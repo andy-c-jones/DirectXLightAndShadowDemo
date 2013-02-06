@@ -5,16 +5,16 @@
 
 class Mesh
 {
-	LPDIRECT3DDEVICE9 _pd3dDevice;
+	IDirect3DDevice9* _pd3dDevice;
 	D3DXMATRIXA16 _worldMatrix;
 	DWORD _numMaterials;
 	std::string _meshFileName;
-	LPD3DXBUFFER _matBuffer;
+	ID3DXBuffer* _matBuffer;
 
 public:
-	LPD3DXMESH  _pMesh;
+	ID3DXMesh* _pMesh;
 
-	Mesh(LPDIRECT3DDEVICE9 device, D3DXVECTOR3& position, std::string meshFileName);
+	Mesh(IDirect3DDevice9* device, D3DXVECTOR3& position, std::string meshFileName);
 	~Mesh();
 
 	D3DXMATRIXA16* GetWorldMat();

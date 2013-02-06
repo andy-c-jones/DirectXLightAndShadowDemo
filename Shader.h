@@ -5,17 +5,17 @@
 class Shader
 {
 protected:
-	LPD3DXBUFFER _pErrorBuffer;
-	LPDIRECT3DDEVICE9 _pd3dDevice;
+	ID3DXBuffer* _pErrorBuffer;
+	IDirect3DDevice9* _pd3dDevice;
 	std::string _effectFileName;
 
 public:
-	LPD3DXEFFECT _pEffect;
+	ID3DXEffect* _pEffect;
 
-	Shader(LPDIRECT3DDEVICE9* InDevice, std::string inEffectFileName) 
+	Shader(IDirect3DDevice9** device, std::string effectFileName) 
 	{
-		_pd3dDevice = *InDevice;
-		_effectFileName = inEffectFileName;
+		_pd3dDevice = *device;
+		_effectFileName = effectFileName;
 		_pEffect = NULL;
 		_pErrorBuffer = NULL;
 	}

@@ -5,9 +5,9 @@
 
 class Environment
 {
-	LPDIRECT3D9 _pD3D;
-	LPDIRECT3DDEVICE9 _pd3dDevice;
-	LPDIRECT3DSURFACE9 _pBackBufferSurface;
+	IDirect3D9* _pD3D;
+	IDirect3DDevice9* _pd3dDevice;
+	IDirect3DSurface9* _pBackBufferSurface;
 
 	Input* _pInput;
 	PlayerCamera* _pMainCamera;
@@ -20,13 +20,13 @@ class Environment
 	Mesh* _pGround;
 	Mesh* _pLight;
 
-	LPDIRECT3DCUBETEXTURE9 _cubicShadowMap;
-	LPDIRECT3DSURFACE9 _depthCubeFacePX;
-	LPDIRECT3DSURFACE9 _depthCubeFacePY;
-	LPDIRECT3DSURFACE9 _depthCubeFacePZ;
-	LPDIRECT3DSURFACE9 _depthCubeFaceNX;
-	LPDIRECT3DSURFACE9 _depthCubeFaceNY;
-	LPDIRECT3DSURFACE9 _depthCubeFaceNZ;
+	IDirect3DCubeTexture9* _cubicShadowMap;
+	IDirect3DSurface9* _depthCubeFacePX;
+	IDirect3DSurface9* _depthCubeFacePY;
+	IDirect3DSurface9* _depthCubeFacePZ;
+	IDirect3DSurface9* _depthCubeFaceNX;
+	IDirect3DSurface9* _depthCubeFaceNY;
+	IDirect3DSurface9* _depthCubeFaceNZ;
 
 	D3DXVECTOR3 _positiveLookX;
 	D3DXVECTOR3 _positiveLookY;
@@ -48,7 +48,7 @@ class Environment
 	
 	void OnFrameMove(DWORD inTimeDelta);
 
-	void RenderDepthToCubeFace(LPDIRECT3DSURFACE9 inCubeFaceSurface);
+	void RenderDepthToCubeFace(IDirect3DSurface9* cubeFaceSurface);
 	void FillCubicShadowMap();
 	void RenderSceneWithShadowMap();
 public:

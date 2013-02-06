@@ -281,7 +281,7 @@ void Environment::OnFrameMove(DWORD inTimeDelta)
 	_pShadowEffect->_pEffect->SetVector(_pShadowEffect->_eyePositionHandle, _pMainCamera->GetPosition4());
 }
 
-void Environment::RenderDepthToCubeFace(LPDIRECT3DSURFACE9 cubeFaceSurface)
+void Environment::RenderDepthToCubeFace(IDirect3DSurface9* cubeFaceSurface)
 {
 	D3DXMATRIXA16 worldViewProjectionMatrix;
 	if(SUCCEEDED(_pd3dDevice->SetRenderTarget( 0, cubeFaceSurface )))
@@ -373,9 +373,11 @@ void Environment::RenderSceneWithShadowMap()
 	_pShadowEffect->_pEffect->End();
 
 	_pShadowEffect->_pEffect->SetTechnique(_pShadowEffect->_ambientHandle);
-	_pShadowEffect->_pEffect->Begin(&numOfPasses, NULL);
-	_pLight->RenderAmbient(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
-	_pShadowEffect->_pEffect->End();
+
+
+	//_pShadowEffect->_pEffect->Begin(&numOfPasses, NULL);
+	//_pLight->RenderAmbient(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
+	//_pShadowEffect->_pEffect->End();
 }
 
 void Environment::Render(DWORD inTimeDelta)

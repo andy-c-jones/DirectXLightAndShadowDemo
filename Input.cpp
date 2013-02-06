@@ -2,17 +2,17 @@
 
 bool Input::Initialise(HWND hwnd, HINSTANCE hInst)
 {
-	if(FAILED(DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&_directInputObject, NULL)))
+	if(FAILED(DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&_directInput, NULL)))
 	{
-		if(FAILED(DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&_directInputObject, NULL)))
+		if(FAILED(DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&_directInput, NULL)))
 		{
 			return false;
 		}
 	}
 
-	if(FAILED(_directInputObject->CreateDevice(GUID_SysKeyboard, &_keyboard, NULL)))
+	if(FAILED(_directInput->CreateDevice(GUID_SysKeyboard, &_keyboard, NULL)))
 	{
-		if(FAILED(_directInputObject->CreateDevice(GUID_SysKeyboard, &_keyboard, NULL)))
+		if(FAILED(_directInput->CreateDevice(GUID_SysKeyboard, &_keyboard, NULL)))
 		{
 			return false;
 		}
@@ -33,9 +33,9 @@ bool Input::Initialise(HWND hwnd, HINSTANCE hInst)
 		}
 	}
 
-	if(FAILED(_directInputObject->CreateDevice(GUID_SysMouse, &_mouse, NULL)))
+	if(FAILED(_directInput->CreateDevice(GUID_SysMouse, &_mouse, NULL)))
 	{
-		if(FAILED(_directInputObject->CreateDevice(GUID_SysMouse, &_mouse, NULL)))
+		if(FAILED(_directInput->CreateDevice(GUID_SysMouse, &_mouse, NULL)))
 		{
 			return false;
 		}
@@ -104,10 +104,10 @@ int Input::IsDPressed()
 
 void Input::CleanUp()
 {
-	if(_directInputObject != NULL)
+	if(_directInput != NULL)
 	{
-		_directInputObject->Release();
-		_directInputObject = NULL;
+		_directInput->Release();
+		_directInput = NULL;
 	}
 
 	if(_keyboard != NULL)

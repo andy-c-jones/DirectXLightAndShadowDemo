@@ -6,9 +6,9 @@
 
 class Input
 {
-	LPDIRECTINPUT8 _directInputObject;
-	LPDIRECTINPUTDEVICE8 _keyboard;
-	LPDIRECTINPUTDEVICE8 _mouse;
+	IDirectInput8* _directInput;
+	IDirectInputDevice8* _keyboard;
+	IDirectInputDevice8* _mouse;
 
 	HRESULT _hr;
 
@@ -19,7 +19,7 @@ public:
 
 	Input()
 	{
-		_directInputObject = NULL;
+		_directInput = NULL;
 		_keyboard = NULL;
 		_mouse = NULL;
 	}
