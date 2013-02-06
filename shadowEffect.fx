@@ -133,9 +133,9 @@ float4 cubicShadowMapping_PS(VS_OUTPUT In) : COLOR0
     float4 diffuse = materialDiffuse * lightResult.diffuseResult;
     float4 specular = materialSpecular * lightResult.specularResult;
 
-    float4 lightingColor = (ambient * (diffuse + specular));
+    float4 lightingColour = (ambient * (diffuse + specular));
     
-    return lightingColor;
+    return lightingColour;
 }
 
 float4 ambient_PS(float4 posWVP : POSITION) : COLOR0
