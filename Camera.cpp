@@ -37,7 +37,7 @@ void Camera::UpdateViewProjectionMatrix()
 	UpdateViewMatrix(); 
 	setProjMat(); 
 
-	D3DXMatrixMultiply(&_viewProjectionMatrix, &_viewMat, &_projectionMatrix);
+	D3DXMatrixMultiply(&_viewProjectionMatrix, &_viewMatrix, &_projectionMatrix);
 }
 
 D3DXVECTOR4* Camera::GetPosition4()
@@ -47,7 +47,7 @@ D3DXVECTOR4* Camera::GetPosition4()
 
 D3DXMATRIXA16* Camera::GetViewMatrix()
 {
-	return &_viewMat;
+	return &_viewMatrix;
 }
 
 D3DXMATRIXA16* Camera::GetProjectionMatrix()
@@ -106,13 +106,13 @@ void Camera::UpdateViewMatrix()
 	D3DXVec3Cross(&_right, &_up, &_look3);
 	D3DXVec3Normalize(&_right, &_right);
 
-	(_viewMat)(0,0) = _right.x; (_viewMat)(0, 1) = _up.x; (_viewMat)(0, 2) = _look3.x; (_viewMat)(0, 3) = 0.0f;
-	(_viewMat)(1,0) = _right.y; (_viewMat)(1, 1) = _up.y; (_viewMat)(1, 2) = _look3.y; (_viewMat)(1, 3) = 0.0f;
-	(_viewMat)(2,0) = _right.z; (_viewMat)(2, 1) = _up.z; (_viewMat)(2, 2) = _look3.z; (_viewMat)(2, 3) = 0.0f;
-	(_viewMat)(3,0) = -D3DXVec3Dot(&_right, &_position3);       
-	(_viewMat)(3, 1) = -D3DXVec3Dot(&_up, &_position3);    
-	(_viewMat)(3, 2) = -D3DXVec3Dot(&_look3, &_position3);      
-	(_viewMat)(3, 3) = 1.0f;
+	(_viewMatrix)(0,0) = _right.x; (_viewMatrix)(0, 1) = _up.x; (_viewMatrix)(0, 2) = _look3.x; (_viewMatrix)(0, 3) = 0.0f;
+	(_viewMatrix)(1,0) = _right.y; (_viewMatrix)(1, 1) = _up.y; (_viewMatrix)(1, 2) = _look3.y; (_viewMatrix)(1, 3) = 0.0f;
+	(_viewMatrix)(2,0) = _right.z; (_viewMatrix)(2, 1) = _up.z; (_viewMatrix)(2, 2) = _look3.z; (_viewMatrix)(2, 3) = 0.0f;
+	(_viewMatrix)(3,0) = -D3DXVec3Dot(&_right, &_position3);       
+	(_viewMatrix)(3, 1) = -D3DXVec3Dot(&_up, &_position3);    
+	(_viewMatrix)(3, 2) = -D3DXVec3Dot(&_look3, &_position3);      
+	(_viewMatrix)(3, 3) = 1.0f;
 }
 
 void Camera::setProjMat()
@@ -124,5 +124,5 @@ void Camera::UpdateCamera()
 {
 	UpdateViewMatrix();
 
-	D3DXMatrixMultiply(&_viewProjectionMatrix , &_viewMat, &_projectionMatrix);
+	D3DXMatrixMultiply(&_viewProjectionMatrix , &_viewMatrix, &_projectionMatrix);
 }

@@ -47,22 +47,18 @@ lightFuncOutput LightPointSH(float3 inObjPos,
      float distance = length(PLightDirection.xyz);
      PLightDirection.xyz = PLightDirection.xyz / distance;
     
-     //compute attenuation factor
      PLightDirection.w = max(0, 1 / (lightAttenuation.x + 
      	                      		 lightAttenuation.y * distance + 
                                		 lightAttenuation.z * distance * distance) );
      
-     //sample depth from cubic shadow map                         		 
 	 float shadowMapDepth = texCUBE(cubeShadowMapSampler, float4(-(PLightDirection.xyz), 0.0f)).x;
-	 //depth comparison
+	 
 	 if(distance > shadowMapDepth)    
 	 {
-	 	 //the pixel is shadowed, so return zero for diffuse and specular
 	 	 return output;
 	 }     	
 	 else
 	 {
-	 	 //the pixel is not in shadow, so compute diffuse and specular and return
 	     float3 floatVecTmp = normalize(inCam2Vertex + PLightDirection.xyz);
 
          output.diffuseResult = PLightDirection.w * lightDiffuse * max(0, dot(inNormal, PLightDirection.xyz));
@@ -144,7 +140,6 @@ float4 cubicShadowMapping_PS(VS_OUTPUT In) : COLOR0
 
 float4 ambient_PS(float4 posWVP : POSITION) : COLOR0
 {
-	//light model colour
 	return float4(1.0f, 1.0f, 1.0f, 1.0f); 
 }
 

@@ -1,11 +1,10 @@
 #pragma once
 #include <Windows.h>
 #include <dinput.h>
-#include "d3dx9.h"
 
 #define KEYDOWN(name, key) (name[key] & 0x80)
 
-class CInput
+class Input
 {
 	LPDIRECTINPUT8 _directInputObject;
 	LPDIRECTINPUTDEVICE8 _keyboard;
@@ -18,14 +17,14 @@ public:
 	char _keyBuffer[256];
 	DIMOUSESTATE _mouseState;
 
-	CInput()
+	Input()
 	{
 		_directInputObject = NULL;
 		_keyboard = NULL;
 		_mouse = NULL;
 	}
 
-	~CInput()
+	~Input()
 	{
 	}
 

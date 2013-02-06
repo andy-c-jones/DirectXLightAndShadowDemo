@@ -151,7 +151,7 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 		return false;
 	}
 
-	_pInput = new CInput();
+	_pInput = new Input();
 	if( !(_pInput->Initialise(hWnd, instance)) )
 	{
 		MessageBoxA(NULL, "Direct Input initialization failed.", "BOOM!", MB_OK);
@@ -159,7 +159,7 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 	}
 
 	D3DXVECTOR3 initialCamPos = D3DXVECTOR3(0.0f, 30.0f, 0.0f);
-	_pMainCamera = new MainCamera(&initialCamPos, D3DX_PI / 2.0f, ((float)screenWidth / (float)screenHeight), 
+	_pMainCamera = new PlayerCamera(&initialCamPos, D3DX_PI / 2.0f, ((float)screenWidth / (float)screenHeight), 
 									1.0f, 500.0f, 20.0f, _pInput);
 
 	_pLightCamera = new Camera(&initialCamPos, (D3DX_PI / 2.0f), 1.0f, 1.0f, 500.0f);
@@ -321,8 +321,6 @@ void Environment::RenderDepthToCubeFace(LPDIRECT3DSURFACE9 cubeFaceSurface)
 void Environment::FillCubicShadowMap()
 {
 	UINT numOfPasses;
-	//disable all colour channels except the red channel since we have a R32F texture
-	//disabling other channels saves bandwidth and improves performance
 	if( FAILED(_pd3dDevice->SetRenderState(D3DRS_COLORWRITEENABLE , D3DCOLORWRITEENABLE_RED )) )
 	{
 		return;
@@ -331,33 +329,21 @@ void Environment::FillCubicShadowMap()
 	_pShadowEffect->_pEffect->SetTechnique(_pShadowEffect->_depthMapHandle);
 	_pShadowEffect->_pEffect->Begin(&numOfPasses, NULL);
 
-	//render the scene depth to positive X side of the cube map
 	CreateCamForPositiveX();
 	RenderDepthToCubeFace(_depthCubeFacePX);
-
-	//render the scene depth to positive Y side of the cube map
 	CreateCamForPositiveY();
 	RenderDepthToCubeFace(_depthCubeFacePY);
-
-	//render the scene depth to positive Z side of the cube map
 	CreateCamForPositiveZ();
 	RenderDepthToCubeFace(_depthCubeFacePZ);
-
-	//render the scene depth to negative X side of the cube map
 	CreateCamForNegativeX();
 	RenderDepthToCubeFace(_depthCubeFaceNX);
-
-	//render the scene depth to negative Y side of the cube map
 	CreateCamForNegativeY();
 	RenderDepthToCubeFace(_depthCubeFaceNY);
-
-	//render the scene depth to negative Z side of the cube map
 	CreateCamForNegativeZ();
 	RenderDepthToCubeFace(_depthCubeFaceNZ);
 
 	_pShadowEffect->_pEffect->End();
 
-	//enable colour writes, next step uses it
 	if( FAILED(_pd3dDevice->SetRenderState(D3DRS_COLORWRITEENABLE, 
 		D3DCOLORWRITEENABLE_ALPHA | 
 		D3DCOLORWRITEENABLE_RED | 
@@ -377,18 +363,15 @@ void Environment::RenderSceneWithShadowMap()
 		_pd3dDevice->Clear(NULL, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00000000, 1.0f, NULL);
 	}
 
-	//set the shadow map in effect
 	_pShadowEffect->_pEffect->SetTexture(_pShadowEffect->_cubeShadowMapHandle, _cubicShadowMap);
 	_pShadowEffect->_pEffect->SetTechnique(_pShadowEffect->_cubicShadowMappingHandle);
 
-	//render each object of the scene using cubic shadow map
 	_pShadowEffect->_pEffect->Begin(&numOfPasses, NULL);
 	_pSphere->RenderMeshWithShadowCube(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
 	_pTeapot->RenderMeshWithShadowCube(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
 	_pGround->RenderMeshWithShadowCube(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
 	_pShadowEffect->_pEffect->End();
 
-	//render the light's mesh(not shadowed but with a simple ambient light shader)
 	_pShadowEffect->_pEffect->SetTechnique(_pShadowEffect->_ambientHandle);
 	_pShadowEffect->_pEffect->Begin(&numOfPasses, NULL);
 	_pLight->RenderAmbient(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);

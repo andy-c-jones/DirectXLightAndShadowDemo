@@ -1,6 +1,6 @@
 #include <Windows.h>
 #include <mmsystem.h>
-#include <d3dx9.h>
+#include <d3dx10.h>
 #include ".\Environment.h"
 #include ".\timeManager.h"
 
@@ -21,36 +21,47 @@ LRESULT WINAPI MsgProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 
 INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )
 {
-	// Register the window class
-	WNDCLASSEX wc = { sizeof(WNDCLASSEX), CS_CLASSDC, MsgProc, 0L, 0L,
-		GetModuleHandle(NULL), NULL, NULL, NULL, NULL,
-		"Cubic Shadow Mapping", NULL };
+	WNDCLASSEX wc = 
+		{
+			sizeof(WNDCLASSEX),
+			CS_CLASSDC,
+			MsgProc,
+			0L,
+			0L,
+			GetModuleHandle(NULL),
+			NULL,
+			NULL,
+			NULL,
+			NULL,
+			"Direct3D Game",
+			NULL 
+		};
 	RegisterClassEx( &wc );
 
-	// Create the application's window
-	HWND hWnd = CreateWindow( "Cubic Shadow Mapping", "Cubic Shadow Mapping",
-		WS_OVERLAPPEDWINDOW, 0, 0, 800, 600,
-		GetDesktopWindow(), NULL, wc.hInstance, NULL );
+	HWND hWnd = CreateWindow("Direct3D Game",
+							 "Direct3D Game",
+							 WS_OVERLAPPEDWINDOW,
+							 0,
+							 0,
+							 800,
+							 600,
+							 GetDesktopWindow(),
+							 NULL,
+							 wc.hInstance,
+							 NULL);
 
-	//////////////////////////////////////////////////////////////////////
-	//initialization	
-	//////////////////////////////////////////////////////////////////////
-	Environment shadowDemo;
-	if( !(shadowDemo.Initialise(hWnd, hInst, 800, 600, true)) )
+	Environment game;
+	if( !(game.Initialise(hWnd, hInst, 800, 600, true)) )
 	{
-		MessageBoxA(NULL, "Initializing the demo failed.", NULL, MB_OK);
+		MessageBoxA(NULL, "Failed to initialise the game.", NULL, MB_OK);
 		return 0;
 	}
 
 	TimeManager timeManager;
-	//////////////////////////////////////////////////////////////////////
-	//....................................................................
-	//////////////////////////////////////////////////////////////////////
 
 	ShowWindow( hWnd, SW_SHOWDEFAULT );
 	UpdateWindow( hWnd );
 
-	// Enter the message loop
 	MSG msg;
 	ZeroMemory( &msg, sizeof(msg) );
 
@@ -63,20 +74,14 @@ INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )
 		}
 		else
 		{
-			//////////////////////////////////////////////////////////////////////
-			//run	
-			//////////////////////////////////////////////////////////////////////
 			timeManager.UpdateLastTime();
-			shadowDemo.Render(timeManager.GetTimeDelta());
+			game.Render(timeManager.GetTimeDelta());
 			timeManager.UpdateCurrentTime();
 			timeManager.UpdateTimeDelta();
-			//////////////////////////////////////////////////////////////////////
-			//....................................................................
-			//////////////////////////////////////////////////////////////////////
 		}
 	}
 
-	UnregisterClass( "Cubic Shadow Mapping", wc.hInstance );
+	UnregisterClass( "Direct3D Game", wc.hInstance );
 
 	return 0;
 }

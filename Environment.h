@@ -1,6 +1,6 @@
 #pragma once
 #include "Input.h"
-#include "MainCamera.h"
+#include "PlayerCamera.h"
 #include "Mesh.h"
 
 class Environment
@@ -9,8 +9,8 @@ class Environment
 	LPDIRECT3DDEVICE9 _pd3dDevice;
 	LPDIRECT3DSURFACE9 _pBackBufferSurface;
 
-	CInput* _pInput;
-	MainCamera* _pMainCamera;
+	Input* _pInput;
+	PlayerCamera* _pMainCamera;
 	Camera* _pLightCamera;
 	ShadowEffect* _pShadowEffect;
 	D3DXVECTOR3 _lightPosition;

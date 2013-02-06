@@ -92,7 +92,7 @@
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MainCamera.cpp" />
+    <ClCompile Include="PlayerCamera.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="ShadowEffect.cpp" />
     <ClCompile Include="TimeManager.cpp" />
@@ -102,7 +102,7 @@
     <ClInclude Include="Environment.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Input.h" />
-    <ClInclude Include="MainCamera.h" />
+    <ClInclude Include="PlayerCamera.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="ShadowEffect.h" />
     <ClInclude Include="TimeManager.h" />

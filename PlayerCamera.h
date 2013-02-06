@@ -2,22 +2,22 @@
 #include "Camera.h"
 #include "Input.h"
 
-class MainCamera : public Camera
+class PlayerCamera : public Camera
 {
-	CInput* _pInput;
+	Input* _pInput;
 	float _moveSpeed;
 	D3DXMATRIXA16 tmpMat;
 
 public:
 
-	MainCamera(D3DXVECTOR3* inPosition3, float inFov, float inAspect, float inNearZ, float inFarZ, float inMoveSpeed, CInput* inInput) 
+	PlayerCamera(D3DXVECTOR3* inPosition3, float inFov, float inAspect, float inNearZ, float inFarZ, float inMoveSpeed, Input* inInput) 
 		: Camera(inPosition3, inFov, inAspect, inNearZ, inFarZ)
 	{
 		_moveSpeed = inMoveSpeed;
 		_pInput = inInput;
 	}
 
-	~MainCamera()
+	~PlayerCamera()
 	{
 	}
 

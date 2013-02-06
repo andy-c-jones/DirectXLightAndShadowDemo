@@ -1,36 +1,36 @@
-#include "MainCamera.h"
+#include "PlayerCamera.h"
 
-float MainCamera::GetMoveSpeed()
+float PlayerCamera::GetMoveSpeed()
 {
 	return _moveSpeed;
 }
 
-void MainCamera::SetMoveSpeed(float inMoveSpeed)
+void PlayerCamera::SetMoveSpeed(float inMoveSpeed)
 {
 	_moveSpeed = inMoveSpeed;
 }
 
-void MainCamera::MoveForwards(float inTimeDelta)
+void PlayerCamera::MoveForwards(float inTimeDelta)
 {
 	this->_position3 += D3DXVECTOR3(this->_look3.x, 0.0f, this->_look3.z) * (_moveSpeed * inTimeDelta);
 }
 
-void MainCamera::MoveBackwards(float inTimeDelta)
+void PlayerCamera::MoveBackwards(float inTimeDelta)
 {
 	this->_position3 -= D3DXVECTOR3(this->_look3.x, 0.0f, this->_look3.z) * (_moveSpeed * inTimeDelta);
 }
 
-void MainCamera::StrafeRight(float inTimeDelta)
+void PlayerCamera::StrafeRight(float inTimeDelta)
 {
 	this->_position3 += D3DXVECTOR3(this->_right.x, 0.0f, this->_right.z) * (_moveSpeed * inTimeDelta);
 }
 
-void MainCamera::StrafeLeft(float inTimeDelta)
+void PlayerCamera::StrafeLeft(float inTimeDelta)
 {
 	this->_position3 -= D3DXVECTOR3(this->_right.x, 0.0f, this->_right.z) * (_moveSpeed * inTimeDelta);
 }
 
-void MainCamera::UpdateCamera(float inTimeDelta)
+void PlayerCamera::UpdateCamera(float inTimeDelta)
 {
 
 	D3DXMatrixRotationY(&tmpMat, (_pInput->_mouseState).lX / 300.0f);
@@ -74,5 +74,5 @@ void MainCamera::UpdateCamera(float inTimeDelta)
 
 	UpdateViewMatrix();
 
-	D3DXMatrixMultiply(&_viewProjectionMatrix , &_viewMat, &_projectionMatrix);
+	D3DXMatrixMultiply(&_viewProjectionMatrix , &_viewMatrix, &_projectionMatrix);
 }

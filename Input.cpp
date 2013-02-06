@@ -1,6 +1,6 @@
 #include "Input.h"
 
-bool CInput::Initialise(HWND hwnd, HINSTANCE hInst)
+bool Input::Initialise(HWND hwnd, HINSTANCE hInst)
 {
 	if(FAILED(DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&_directInputObject, NULL)))
 	{
@@ -60,7 +60,7 @@ bool CInput::Initialise(HWND hwnd, HINSTANCE hInst)
 	return true;
 }
 
-void CInput::GetInputData()
+void Input::GetInputData()
 {
 	_keyboard->Acquire();
 	_hr = _keyboard->GetDeviceState(sizeof(_keyBuffer), (LPVOID)&_keyBuffer); 
@@ -82,27 +82,27 @@ void CInput::GetInputData()
 	}
 }
 
-int CInput::IsWPressed()
+int Input::IsWPressed()
 {
 	return KEYDOWN(_keyBuffer, DIK_W);
 }
 
-int CInput::IsSPressed()
+int Input::IsSPressed()
 {
 	return KEYDOWN(_keyBuffer, DIK_S);
 }
 
-int CInput::IsAPressed()
+int Input::IsAPressed()
 {
 	return KEYDOWN(_keyBuffer, DIK_A);
 }
 
-int CInput::IsDPressed()
+int Input::IsDPressed()
 {
 	return KEYDOWN(_keyBuffer, DIK_D);
 }
 
-void CInput::CleanUp()
+void Input::CleanUp()
 {
 	if(_directInputObject != NULL)
 	{

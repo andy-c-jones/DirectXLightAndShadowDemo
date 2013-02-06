@@ -9,10 +9,10 @@
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MainCamera.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="ShadowEffect.cpp" />
     <ClCompile Include="TimeManager.cpp" />
+    <ClCompile Include="PlayerCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -22,9 +22,6 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="Input.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="MainCamera.h">
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="Mesh.h">
@@ -37,6 +34,9 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="TimeManager.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerCamera.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

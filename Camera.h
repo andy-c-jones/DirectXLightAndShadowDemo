@@ -47,7 +47,7 @@ protected:
 	D3DXVECTOR4 _look4;
 	D3DXVECTOR3 _right;
 
-	D3DXMATRIXA16 _viewMat;
+	D3DXMATRIXA16 _viewMatrix;
 	D3DXMATRIXA16 _projectionMatrix;
 	D3DXMATRIXA16 _viewProjectionMatrix;
 

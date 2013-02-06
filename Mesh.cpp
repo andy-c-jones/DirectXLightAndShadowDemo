@@ -7,6 +7,7 @@ Mesh::Mesh(LPDIRECT3DDEVICE9 device, D3DXVECTOR3& position, std::string meshFile
 	D3DXMatrixTranslation(&_worldMatrix, position.x, position.y, position.z);
 	_meshFileName = meshFileName;
 	_pMesh = NULL;
+	_matBuffer = NULL;
 }
 
 Mesh::~Mesh()
@@ -26,9 +27,9 @@ void Mesh::Translate(float inX, float inY, float inZ)
 
 bool Mesh::Load()
 {
-	if( FAILED( D3DXLoadMeshFromX( _meshFileName.c_str(), D3DXMESH_MANAGED,	_pd3dDevice, NULL, NULL, NULL, &_numMaterials, &_pMesh)))
+	if( FAILED( D3DXLoadMeshFromX( _meshFileName.c_str(), D3DXMESH_MANAGED,	_pd3dDevice, NULL, &_matBuffer, NULL, &_numMaterials, &_pMesh)))
 	{
-		if( FAILED( D3DXLoadMeshFromX( _meshFileName.c_str(), D3DXMESH_MANAGED,	_pd3dDevice, NULL, NULL, NULL, &_numMaterials, &_pMesh)))
+		if( FAILED( D3DXLoadMeshFromX( _meshFileName.c_str(), D3DXMESH_MANAGED,	_pd3dDevice, NULL, &_matBuffer, NULL, &_numMaterials, &_pMesh)))
 		{
 			return false;
 		}
