@@ -2,6 +2,7 @@
 #include "Input.h"
 #include "PlayerCamera.h"
 #include "Mesh.h"
+#include "Light.h"
 
 class Environment
 {
@@ -11,14 +12,14 @@ class Environment
 
 	Input* _pInput;
 	PlayerCamera* _pMainCamera;
-	Camera* _pLightCamera;
+	Light* _pLight;
 	ShadowEffect* _pShadowEffect;
 	D3DXVECTOR3 _lightPosition;
 
 	Mesh* _pTeapot;
 	Mesh* _pSphere;
 	Mesh* _pGround;
-	Mesh* _pLight;
+	Mesh* _pLightMesh;
 
 	IDirect3DCubeTexture9* _cubicShadowMap;
 	IDirect3DSurface9* _depthCubeFacePX;

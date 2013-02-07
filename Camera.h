@@ -28,12 +28,6 @@ public:
 	void SetLook(D3DXVECTOR3* inLook);
 	void SetUp(D3DXVECTOR3* inUp);
 	void SetRight(D3DXVECTOR3* inRight);
-	void SetCameraToPositiveX();
-	void SetCameraToPositiveY();
-	void SetCameraToPositiveZ();
-	void SetCameraToNegativeX();
-	void SetCameraToNegativeY();
-	void SetCameraToNegativeZ();
 	virtual void UpdateCamera(); 
 
 protected:
@@ -57,7 +51,6 @@ protected:
 
 	void setProjMat(); 
 
-private:
 	D3DXVECTOR3 _positiveLookX;
 	D3DXVECTOR3 _positiveLookY;
 	D3DXVECTOR3 _positiveLookZ;

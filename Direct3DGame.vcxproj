@@ -91,6 +91,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Environment.cpp" />
+    <ClCompile Include="Light.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
@@ -102,6 +103,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Environment.h" />
+    <ClInclude Include="Light.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="PlayerCamera.h" />

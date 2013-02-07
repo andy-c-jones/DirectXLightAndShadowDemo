@@ -8,13 +8,13 @@ Environment::Environment(Input* input)
 
 	_pInput = NULL;  
 	_pMainCamera = NULL;
-	_pLightCamera = NULL;
+	_pLight = NULL;
 	_pShadowEffect = NULL;
 
 	_pTeapot = NULL;
 	_pSphere = NULL;
 	_pGround = NULL;
-	_pLight = NULL;
+	_pLightMesh = NULL;
 
 	_cubicShadowMap = NULL;
 	_depthCubeFacePX = NULL;
@@ -157,7 +157,7 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 	_pMainCamera = new PlayerCamera(&initialCamPos, D3DX_PI / 2.0f, ((float)screenWidth / (float)screenHeight), 
 									1.0f, 500.0f, 20.0f, _pInput);
 
-	_pLightCamera = new Camera(&initialCamPos, (D3DX_PI / 2.0f), 1.0f, 1.0f, 500.0f);
+	_pLight = new Light(&initialCamPos, (D3DX_PI / 2.0f), 1.0f, 1.0f, 500.0f);
 
 	D3DXVECTOR3 teapotPos = D3DXVECTOR3(0.0f, 0.0f, 30.0f);
 	D3DXVECTOR3 spherePos = D3DXVECTOR3(0.0f, 10.0f, 50.0f);
@@ -183,8 +183,8 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 		return false;
 	}
 
-	_pLight = new Mesh(_pd3dDevice, lightPos, "light.x");
-	if( !(_pLight->Load()) )
+	_pLightMesh = new Mesh(_pd3dDevice, lightPos, "light.x");
+	if( !(_pLightMesh->Load()) )
 	{
 		MessageBoxA(NULL, "loading light mesh failed.", "BOOM!", MB_OK);
 		return false;
@@ -208,8 +208,8 @@ void Environment::OnFrameMove(DWORD inTimeDelta)
 	_lightPosition.x += _lightMoveSpeed;
 
 	_pShadowEffect->_pEffect->SetVector(_pShadowEffect->_lightPositionHandle, &D3DXVECTOR4(_lightPosition, 1.0f));
-	_pLightCamera->SetPosition(&_lightPosition);
-	_pLight->Translate(_lightPosition.x, _lightPosition.y, _lightPosition.z);
+	_pLight->SetPosition(&_lightPosition);
+	_pLightMesh->Translate(_lightPosition.x, _lightPosition.y, _lightPosition.z);
 
 	_pShadowEffect->_pEffect->SetVector(_pShadowEffect->_eyePositionHandle, _pMainCamera->GetPosition4());
 }
@@ -226,7 +226,7 @@ void Environment::RenderDepthToCubeFace(IDirect3DSurface9* cubeFaceSurface)
 		return;
 	}
 
-	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pGround->GetWorldMat(), _pLightCamera->GetViewProjectionMatrix());
+	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pGround->GetWorldMat(), _pLight->GetViewProjectionMatrix());
 	_pShadowEffect->_pEffect->SetMatrix(_pShadowEffect->_worldMatHandle, _pGround->GetWorldMat());
 	_pShadowEffect->_pEffect->SetMatrix(_pShadowEffect->_worldViewProjMatHandle, &worldViewProjectionMatrix);
 
@@ -234,7 +234,7 @@ void Environment::RenderDepthToCubeFace(IDirect3DSurface9* cubeFaceSurface)
 	_pGround->_pMesh->DrawSubset(0);
 	_pShadowEffect->_pEffect->EndPass();
 
-	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pTeapot->GetWorldMat(), _pLightCamera->GetViewProjectionMatrix());
+	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pTeapot->GetWorldMat(), _pLight->GetViewProjectionMatrix());
 	_pShadowEffect->_pEffect->SetMatrix(_pShadowEffect->_worldMatHandle, _pTeapot->GetWorldMat());
 	_pShadowEffect->_pEffect->SetMatrix(_pShadowEffect->_worldViewProjMatHandle, &worldViewProjectionMatrix);
 
@@ -242,7 +242,7 @@ void Environment::RenderDepthToCubeFace(IDirect3DSurface9* cubeFaceSurface)
 	//_pTeapot->_pMesh->DrawSubset(0);
 	//_pShadowEffect->_pEffect->EndPass();
 
-	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pSphere->GetWorldMat(), _pLightCamera->GetViewProjectionMatrix());
+	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pSphere->GetWorldMat(), _pLight->GetViewProjectionMatrix());
 	_pShadowEffect->_pEffect->SetMatrix(_pShadowEffect->_worldMatHandle, _pSphere->GetWorldMat());
 	_pShadowEffect->_pEffect->SetMatrix(_pShadowEffect->_worldViewProjMatHandle, &worldViewProjectionMatrix);
 
@@ -262,17 +262,17 @@ void Environment::FillCubicShadowMap()
 	_pShadowEffect->_pEffect->SetTechnique(_pShadowEffect->_depthMapHandle);
 	_pShadowEffect->_pEffect->Begin(&numOfPasses, NULL);
 
-	_pLightCamera->SetCameraToPositiveX();
+	_pLight->SetCameraToPositiveX();
 	RenderDepthToCubeFace(_depthCubeFacePX);
-	_pLightCamera->SetCameraToPositiveY();
+	_pLight->SetCameraToPositiveY();
 	RenderDepthToCubeFace(_depthCubeFacePY);
-	_pLightCamera->SetCameraToPositiveZ();
+	_pLight->SetCameraToPositiveZ();
 	RenderDepthToCubeFace(_depthCubeFacePZ);
-	_pLightCamera->SetCameraToNegativeX();
+	_pLight->SetCameraToNegativeX();
 	RenderDepthToCubeFace(_depthCubeFaceNX);
-	_pLightCamera->SetCameraToNegativeY();
+	_pLight->SetCameraToNegativeY();
 	RenderDepthToCubeFace(_depthCubeFaceNY);
-	_pLightCamera->SetCameraToNegativeZ();
+	_pLight->SetCameraToNegativeZ();
 	RenderDepthToCubeFace(_depthCubeFaceNZ);
 
 	_pShadowEffect->_pEffect->End();
@@ -309,7 +309,7 @@ void Environment::RenderSceneWithShadowMap()
 
 
 	//_pShadowEffect->_pEffect->Begin(&numOfPasses, NULL);
-	//_pLight->RenderAmbient(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
+	//_pLightMesh->RenderAmbient(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
 	//_pShadowEffect->_pEffect->End();
 }
 
@@ -356,10 +356,10 @@ void Environment::CleanUp()
 		delete _pMainCamera;
 		_pMainCamera = NULL;
 	}
-	if( _pLightCamera != NULL )
+	if( _pLight != NULL )
 	{
-		delete _pLightCamera;
-		_pLightCamera = NULL;
+		delete _pLight;
+		_pLight = NULL;
 	}
 	if( _pShadowEffect != NULL )
 	{
@@ -386,11 +386,11 @@ void Environment::CleanUp()
 		delete _pGround;
 		_pGround = NULL;
 	}
-	if( _pLight != NULL )
+	if( _pLightMesh != NULL )
 	{
-		_pLight->CleanUp();
-		delete _pLight;
-		_pLight = NULL;
+		_pLightMesh->CleanUp();
+		delete _pLightMesh;
+		_pLightMesh = NULL;
 	}
 
 	if( _cubicShadowMap != NULL )

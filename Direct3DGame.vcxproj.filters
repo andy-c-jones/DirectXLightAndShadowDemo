@@ -13,6 +13,7 @@
     <ClCompile Include="ShadowEffect.cpp" />
     <ClCompile Include="TimeManager.cpp" />
     <ClCompile Include="PlayerCamera.cpp" />
+    <ClCompile Include="Light.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -37,6 +38,9 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="PlayerCamera.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
