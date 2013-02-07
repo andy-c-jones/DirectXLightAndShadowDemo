@@ -30,11 +30,13 @@ public:
 
 	bool Initialise(HWND hwnd, HINSTANCE hInst);
 	void GetInputData();
+	void GetKeyboardState();
 
 	int IsWPressed();
 	int IsSPressed();
 	int IsAPressed();
 	int IsDPressed();
+	int IsEscapePressed();
 
 	void CleanUp();
 };

@@ -53,7 +53,15 @@ INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )
 							 wc.hInstance,
 							 NULL);
 
-	Environment game;
+	Input* pInput = new Input();
+	if( !(pInput->Initialise(hWnd, wc.hInstance)) )
+	{
+		MessageBoxA(NULL, "Direct Input initialisation failed.", "BOOM!", MB_OK);
+		return false;
+	}
+
+	Environment game = Environment(pInput);
+
 	if( !(game.Initialise(hWnd, hInst, windowWidth, windowHeight, true)) )
 	{
 		MessageBoxA(NULL, "Failed to initialise the game.", NULL, MB_OK);
@@ -81,6 +89,12 @@ INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )
 			game.Render(timeManager.GetTimeDelta());
 			timeManager.UpdateCurrentTime();
 			timeManager.UpdateTimeDelta();
+		}
+
+		pInput->GetKeyboardState();
+		if(pInput->IsEscapePressed())
+		{
+			msg.message = WM_QUIT;
 		}
 	}
 

@@ -82,6 +82,21 @@ void Input::GetInputData()
 	}
 }
 
+void Input::GetKeyboardState()
+{
+	_keyboard->Acquire();
+	_hr = _keyboard->GetDeviceState(sizeof(_keyBuffer), (LPVOID)&_keyBuffer); 
+
+	if(_hr != DI_OK)
+	{
+		_keyboard->Acquire();
+		while(_hr == DIERR_INPUTLOST)
+		{
+			_hr = _keyboard->Acquire();
+		}
+	}
+}
+
 int Input::IsWPressed()
 {
 	return KEYDOWN(_keyBuffer, DIK_W);
@@ -100,6 +115,11 @@ int Input::IsAPressed()
 int Input::IsDPressed()
 {
 	return KEYDOWN(_keyBuffer, DIK_D);
+}
+
+int Input::IsEscapePressed()
+{
+	return KEYDOWN(_keyBuffer, DIK_ESCAPE);
 }
 
 void Input::CleanUp()

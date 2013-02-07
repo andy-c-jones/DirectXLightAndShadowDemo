@@ -1,6 +1,6 @@
 #include "Environment.h"
 
-Environment::Environment()
+Environment::Environment(Input* input)
 {
 	_pD3D = NULL;
 	_pd3dDevice = NULL;
@@ -24,6 +24,8 @@ Environment::Environment()
 	_depthCubeFaceNY = NULL;
 	_depthCubeFaceNZ = NULL;
 	_lightMoveSpeed = 0.01f;
+
+	_pInput = input;
 }
 
 Environment::~Environment()
@@ -151,12 +153,12 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 		return false;
 	}
 
-	_pInput = new Input();
-	if( !(_pInput->Initialise(hWnd, instance)) )
-	{
-		MessageBoxA(NULL, "Direct Input initialization failed.", "BOOM!", MB_OK);
-		return false;
-	}
+	//_pInput = new Input();
+	//if( !(_pInput->Initialise(hWnd, instance)) )
+	//{
+	//	MessageBoxA(NULL, "Direct Input initialization failed.", "BOOM!", MB_OK);
+	//	return false;
+	//}
 
 	D3DXVECTOR3 initialCamPos = D3DXVECTOR3(0.0f, 30.0f, 0.0f);
 	_pMainCamera = new PlayerCamera(&initialCamPos, D3DX_PI / 2.0f, ((float)screenWidth / (float)screenHeight), 

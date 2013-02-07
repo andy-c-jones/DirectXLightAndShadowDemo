@@ -52,7 +52,7 @@ class Environment
 	void FillCubicShadowMap();
 	void RenderSceneWithShadowMap();
 public:
-	Environment();
+	Environment(Input* input);
 	~Environment();
 
 	bool Initialise(HWND hWnd, HINSTANCE inInstance, UINT inScreenWidth, UINT inScreenHeight, BOOL inWindowed);
