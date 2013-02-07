@@ -37,20 +37,24 @@ INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )
 		};
 	RegisterClassEx( &wc );
 
+	int windowWidth = 1024;
+	int windowHeight = 768;
+	int posX = (GetSystemMetrics(SM_CXSCREEN) - windowWidth)  / 2;
+	int posY = (GetSystemMetrics(SM_CYSCREEN) - windowHeight) / 2;
 	HWND hWnd = CreateWindow("Direct3D Game",
 							 "Direct3D Game",
-							 WS_OVERLAPPEDWINDOW,
-							 0,
-							 0,
-							 800,
-							 600,
+							 WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_CAPTION| WS_SIZEBOX,
+							 posX,
+							 posY,
+							 windowWidth,
+							 windowHeight,
 							 GetDesktopWindow(),
 							 NULL,
 							 wc.hInstance,
 							 NULL);
 
 	Environment game;
-	if( !(game.Initialise(hWnd, hInst, 800, 600, true)) )
+	if( !(game.Initialise(hWnd, hInst, windowWidth, windowHeight, true)) )
 	{
 		MessageBoxA(NULL, "Failed to initialise the game.", NULL, MB_OK);
 		return 0;

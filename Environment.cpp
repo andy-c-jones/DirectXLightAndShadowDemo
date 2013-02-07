@@ -208,58 +208,58 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 	return true;
 }
 
-void Environment::CreateCamForPositiveX()
+void Environment::CreateCamForPositiveX(Camera* lightCamera)
 {
-	_pLightCamera->SetLook(&_positiveLookX);
-	_pLightCamera->SetUp(&_positiveLookY);
-	_pLightCamera->SetRight(&_negativeLookZ);
+	lightCamera->SetLook(&_positiveLookX);
+	lightCamera->SetUp(&_positiveLookY);
+	lightCamera->SetRight(&_negativeLookZ);
 
-	_pLightCamera->UpdateViewProjectionMatrix();
+	lightCamera->UpdateViewProjectionMatrix();
 }
 
-void Environment::CreateCamForNegativeX()
+void Environment::CreateCamForNegativeX(Camera* lightCamera)
 {
-	_pLightCamera->SetLook(&_negativeLookX);
-	_pLightCamera->SetUp(&_positiveLookY);
-	_pLightCamera->SetRight(&_positiveLookZ);
+	lightCamera->SetLook(&_negativeLookX);
+	lightCamera->SetUp(&_positiveLookY);
+	lightCamera->SetRight(&_positiveLookZ);
 
-	_pLightCamera->UpdateViewProjectionMatrix();
+	lightCamera->UpdateViewProjectionMatrix();
 }
 
-void Environment::CreateCamForPositiveY()
+void Environment::CreateCamForPositiveY(Camera* lightCamera)
 {
-	_pLightCamera->SetLook(&_positiveLookY);
-	_pLightCamera->SetUp(&_negativeLookZ);
-	_pLightCamera->SetRight(&_positiveLookX);
+	lightCamera->SetLook(&_positiveLookY);
+	lightCamera->SetUp(&_negativeLookZ);
+	lightCamera->SetRight(&_positiveLookX);
 
-	_pLightCamera->UpdateViewProjectionMatrix();
+	lightCamera->UpdateViewProjectionMatrix();
 }
 
-void Environment::CreateCamForNegativeY()
+void Environment::CreateCamForNegativeY(Camera* lightCamera)
 {
-	_pLightCamera->SetLook(&_negativeLookY);
-	_pLightCamera->SetUp(&_negativeLookZ);
-	_pLightCamera->SetRight(&_negativeLookX);
+	lightCamera->SetLook(&_negativeLookY);
+	lightCamera->SetUp(&_negativeLookZ);
+	lightCamera->SetRight(&_negativeLookX);
 
-	_pLightCamera->UpdateViewProjectionMatrix();
+	lightCamera->UpdateViewProjectionMatrix();
 }
 
-void Environment::CreateCamForPositiveZ()
+void Environment::CreateCamForPositiveZ(Camera* lightCamera)
 {
-	_pLightCamera->SetLook(&_positiveLookZ);
-	_pLightCamera->SetUp(&_positiveLookY);
-	_pLightCamera->SetRight(&_positiveLookX);
+	lightCamera->SetLook(&_positiveLookZ);
+	lightCamera->SetUp(&_positiveLookY);
+	lightCamera->SetRight(&_positiveLookX);
 
-	_pLightCamera->UpdateViewProjectionMatrix();
+	lightCamera->UpdateViewProjectionMatrix();
 }
 
-void Environment::CreateCamForNegativeZ()
+void Environment::CreateCamForNegativeZ(Camera* lightCamera)
 {
-	_pLightCamera->SetLook(&_negativeLookZ);
-	_pLightCamera->SetUp(&_positiveLookY);
-	_pLightCamera->SetRight(&_negativeLookX);
+	lightCamera->SetLook(&_negativeLookZ);
+	lightCamera->SetUp(&_positiveLookY);
+	lightCamera->SetRight(&_negativeLookX);
 
-	_pLightCamera->UpdateViewProjectionMatrix();
+	lightCamera->UpdateViewProjectionMatrix();
 }
 
 void Environment::OnFrameMove(DWORD inTimeDelta)
@@ -305,9 +305,9 @@ void Environment::RenderDepthToCubeFace(IDirect3DSurface9* cubeFaceSurface)
 	_pShadowEffect->_pEffect->SetMatrix(_pShadowEffect->_worldMatHandle, _pTeapot->GetWorldMat());
 	_pShadowEffect->_pEffect->SetMatrix(_pShadowEffect->_worldViewProjMatHandle, &worldViewProjectionMatrix);
 
-	_pShadowEffect->_pEffect->BeginPass(0);
-	_pTeapot->_pMesh->DrawSubset(0);
-	_pShadowEffect->_pEffect->EndPass();
+	//_pShadowEffect->_pEffect->BeginPass(0);
+	//_pTeapot->_pMesh->DrawSubset(0);
+	//_pShadowEffect->_pEffect->EndPass();
 
 	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pSphere->GetWorldMat(), _pLightCamera->GetViewProjectionMatrix());
 	_pShadowEffect->_pEffect->SetMatrix(_pShadowEffect->_worldMatHandle, _pSphere->GetWorldMat());
@@ -329,17 +329,17 @@ void Environment::FillCubicShadowMap()
 	_pShadowEffect->_pEffect->SetTechnique(_pShadowEffect->_depthMapHandle);
 	_pShadowEffect->_pEffect->Begin(&numOfPasses, NULL);
 
-	CreateCamForPositiveX();
+	CreateCamForPositiveX(_pLightCamera);
 	RenderDepthToCubeFace(_depthCubeFacePX);
-	CreateCamForPositiveY();
+	CreateCamForPositiveY(_pLightCamera);
 	RenderDepthToCubeFace(_depthCubeFacePY);
-	CreateCamForPositiveZ();
+	CreateCamForPositiveZ(_pLightCamera);
 	RenderDepthToCubeFace(_depthCubeFacePZ);
-	CreateCamForNegativeX();
+	CreateCamForNegativeX(_pLightCamera);
 	RenderDepthToCubeFace(_depthCubeFaceNX);
-	CreateCamForNegativeY();
+	CreateCamForNegativeY(_pLightCamera);
 	RenderDepthToCubeFace(_depthCubeFaceNY);
-	CreateCamForNegativeZ();
+	CreateCamForNegativeZ(_pLightCamera);
 	RenderDepthToCubeFace(_depthCubeFaceNZ);
 
 	_pShadowEffect->_pEffect->End();
@@ -368,7 +368,7 @@ void Environment::RenderSceneWithShadowMap()
 
 	_pShadowEffect->_pEffect->Begin(&numOfPasses, NULL);
 	_pSphere->RenderMeshWithShadowCube(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
-	_pTeapot->RenderMeshWithShadowCube(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
+	//_pTeapot->RenderMeshWithShadowCube(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
 	_pGround->RenderMeshWithShadowCube(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
 	_pShadowEffect->_pEffect->End();
 

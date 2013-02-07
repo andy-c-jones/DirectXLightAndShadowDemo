@@ -7,8 +7,8 @@ const float4 materialDiffuse = float4(1.0f, 1.0f, 1.0f, 1.0f);
 const float4 materialSpecular = float4(1.0f, 1.0f, 1.0f, 1.0f);
 const float4 globalAmbient = float4(1.0f, 1.0f, 1.0f, 1.0f);
 
-const float4 lightDiffuse = float4(0.5f, 0.5f, 0.5f, 1.0f);
-const float4 lightSpecular = float4(0.5f, 0.5f, 0.5f, 1.0f);
+const float4 lightDiffuse = float4(0.7f, 0.7f, 0.7f, 1.0f);
+const float4 lightSpecular = float4(0.3f, 0.3f, 0.3f, 1.0f);
 const float4 lightAttenuation = float4(0.0f, 0.05f, 0.0f, 1.0f);
 
 const float specPower = 64.0f;

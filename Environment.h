@@ -37,12 +37,12 @@ class Environment
 
 	float _lightMoveSpeed;
 
-	void CreateCamForPositiveX();
-	void CreateCamForNegativeX();
-	void CreateCamForPositiveY();
-	void CreateCamForNegativeY();
-	void CreateCamForPositiveZ();
-	void CreateCamForNegativeZ();
+	void CreateCamForPositiveX(Camera* lightCamera);
+	void CreateCamForNegativeX(Camera* lightCamera);
+	void CreateCamForPositiveY(Camera* lightCamera);
+	void CreateCamForNegativeY(Camera* lightCamera);
+	void CreateCamForPositiveZ(Camera* lightCamera);
+	void CreateCamForNegativeZ(Camera* lightCamera);
 
 	bool InitialiseDirectX(HWND hWnd, UINT inScreenWidth, UINT inScreenHeight, BOOL inWindowed);
 	
