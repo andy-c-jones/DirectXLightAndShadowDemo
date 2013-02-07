@@ -6,14 +6,22 @@ Camera::Camera(D3DXVECTOR3* position3,
 					 float nearZ, 
 					 float farZ)
 {
+	_positiveLookX = D3DXVECTOR3(1.0f, 0.0f, 0.0f);
+	_positiveLookY = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	_positiveLookZ = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
+
+	_negativeLookX = D3DXVECTOR3(-1.0f, 0.0f, 0.0f);
+	_negativeLookY = D3DXVECTOR3(0.0f, -1.0f, 0.0f);
+	_negativeLookZ = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
+
 	_position3 = *position3;
 	_fieldOfView = fov;
 	_aspectRatio = aspect;
 	_nearZ = nearZ;
 	_farZ = farZ;
-	_up = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-	_look3 = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
-	_right = D3DXVECTOR3(1.0f, 0.0f, 0.0f);
+	_up = _positiveLookY;
+	_look3 = _positiveLookZ;
+	_right = _positiveLookX;
 	_camInitialY = _position3.y;
 	UpdateViewProjectionMatrix();
 }
@@ -125,4 +133,52 @@ void Camera::UpdateCamera()
 	UpdateViewMatrix();
 
 	D3DXMatrixMultiply(&_viewProjectionMatrix , &_viewMatrix, &_projectionMatrix);
+}
+
+void Camera::SetCameraToPositiveX()
+{
+	SetLook(&_positiveLookX);
+	SetUp(&_positiveLookY);
+	SetRight(&_negativeLookZ);
+	UpdateViewProjectionMatrix();
+}
+
+void Camera::SetCameraToPositiveY()
+{
+	SetLook(&_positiveLookY);
+	SetUp(&_negativeLookZ);
+	SetRight(&_positiveLookX);
+	UpdateViewProjectionMatrix();
+}
+
+void Camera::SetCameraToPositiveZ()
+{
+	SetLook(&_positiveLookZ);
+	SetUp(&_positiveLookY);
+	SetRight(&_positiveLookX);
+	UpdateViewProjectionMatrix();
+}
+
+void Camera::SetCameraToNegativeX()
+{
+	SetLook(&_negativeLookX);
+	SetUp(&_positiveLookY);
+	SetRight(&_positiveLookZ);
+	UpdateViewProjectionMatrix();
+}
+
+void Camera::SetCameraToNegativeY()
+{
+	SetLook(&_negativeLookY);
+	SetUp(&_negativeLookZ);
+	SetRight(&_negativeLookX);
+	UpdateViewProjectionMatrix();
+}
+
+void Camera::SetCameraToNegativeZ()
+{
+	SetLook(&_negativeLookZ);
+	SetUp(&_positiveLookY);
+	SetRight(&_negativeLookX);
+	UpdateViewProjectionMatrix();
 }

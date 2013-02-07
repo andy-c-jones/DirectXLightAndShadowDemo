@@ -28,21 +28,9 @@ class Environment
 	IDirect3DSurface9* _depthCubeFaceNY;
 	IDirect3DSurface9* _depthCubeFaceNZ;
 
-	D3DXVECTOR3 _positiveLookX;
-	D3DXVECTOR3 _positiveLookY;
-	D3DXVECTOR3 _positiveLookZ;
-	D3DXVECTOR3 _negativeLookX;
-	D3DXVECTOR3 _negativeLookY;
-	D3DXVECTOR3 _negativeLookZ;
+
 
 	float _lightMoveSpeed;
-
-	void CreateCamForPositiveX(Camera* lightCamera);
-	void CreateCamForNegativeX(Camera* lightCamera);
-	void CreateCamForPositiveY(Camera* lightCamera);
-	void CreateCamForNegativeY(Camera* lightCamera);
-	void CreateCamForPositiveZ(Camera* lightCamera);
-	void CreateCamForNegativeZ(Camera* lightCamera);
 
 	bool InitialiseDirectX(HWND hWnd, UINT inScreenWidth, UINT inScreenHeight, BOOL inWindowed);
 	

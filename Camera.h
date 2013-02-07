@@ -20,7 +20,6 @@ public:
 	D3DXMATRIXA16* GetProjectionMatrix();
 	D3DXMATRIXA16* GetViewProjectionMatrix();
 	D3DXMATRIXA16* GetViewProjectionLastMatrix();
-
 	D3DXVECTOR3* GetLook();
 	D3DXVECTOR4* GetLook4();
 	D3DXVECTOR3* GetRight();
@@ -29,7 +28,12 @@ public:
 	void SetLook(D3DXVECTOR3* inLook);
 	void SetUp(D3DXVECTOR3* inUp);
 	void SetRight(D3DXVECTOR3* inRight);
-
+	void SetCameraToPositiveX();
+	void SetCameraToPositiveY();
+	void SetCameraToPositiveZ();
+	void SetCameraToNegativeX();
+	void SetCameraToNegativeY();
+	void SetCameraToNegativeZ();
 	virtual void UpdateCamera(); 
 
 protected:
@@ -52,4 +56,12 @@ protected:
 	D3DXMATRIXA16 _viewProjectionMatrix;
 
 	void setProjMat(); 
+
+private:
+	D3DXVECTOR3 _positiveLookX;
+	D3DXVECTOR3 _positiveLookY;
+	D3DXVECTOR3 _positiveLookZ;
+	D3DXVECTOR3 _negativeLookX;
+	D3DXVECTOR3 _negativeLookY;
+	D3DXVECTOR3 _negativeLookZ;
 };
