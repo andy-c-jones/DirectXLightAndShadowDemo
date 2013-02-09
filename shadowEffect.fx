@@ -31,8 +31,8 @@ samplerCUBE cubeShadowMapSampler = sampler_state
 
 struct lightFuncOutput
 {
-    float4 diffuseResult;
-    float4 specularResult;
+    float4 diffuseResult[1];
+    float4 specularResult[1];
 };
 
 lightFuncOutput LightPointSH(float3 inObjPos, 
@@ -40,8 +40,8 @@ lightFuncOutput LightPointSH(float3 inObjPos,
 						     float3 inCam2Vertex)
 {
      lightFuncOutput output;
-     output.diffuseResult = float4(0.0f, 0.0f, 0.0f, 1.0f);
-     output.specularResult = float4(0.0f, 0.0f, 0.0f, 1.0f);
+     output.diffuseResult[0] = float4(0.0f, 0.0f, 0.0f, 1.0f);
+     output.specularResult[0] = float4(0.0f, 0.0f, 0.0f, 1.0f);
 
      float4 PLightDirection = 0.0f;
      PLightDirection.xyz = lightPosition[0].xyz - inObjPos;
@@ -62,8 +62,8 @@ lightFuncOutput LightPointSH(float3 inObjPos,
 	 {
 	     float3 floatVecTmp = normalize(inCam2Vertex + PLightDirection.xyz);
 
-         output.diffuseResult = PLightDirection.w * lightDiffuse * max(0, dot(inNormal, PLightDirection.xyz));
-         output.specularResult = PLightDirection.w * lightSpecular * pow(max (0, dot(inNormal, floatVecTmp) ), specPower);
+         output.diffuseResult[0] = PLightDirection.w * lightDiffuse * max(0, dot(inNormal, PLightDirection.xyz));
+         output.specularResult[0] = PLightDirection.w * lightSpecular * pow(max (0, dot(inNormal, floatVecTmp) ), specPower);
 
          return output;
 	 }
@@ -131,8 +131,8 @@ float4 cubicShadowMapping_PS(VS_OUTPUT In) : COLOR0
     lightResult = LightPointSH(In.worldPos, normal, cam2Vert);
     
     float4 ambient = materialAmbient * globalAmbient;
-    float4 diffuse = materialDiffuse * lightResult.diffuseResult;
-    float4 specular = materialSpecular * lightResult.specularResult;
+    float4 diffuse = materialDiffuse * lightResult.diffuseResult[0];
+    float4 specular = materialSpecular * lightResult.specularResult[0];
 
     float4 lightingColour = (ambient * (diffuse + specular));
     
