@@ -16,13 +16,6 @@ Environment::Environment(Input* input)
 	_pGround = NULL;
 	_pLightMesh = NULL;
 
-	_cubicShadowMap = NULL;
-	_depthCubeFacePX = NULL;
-	_depthCubeFacePY = NULL;
-	_depthCubeFacePZ = NULL;
-	_depthCubeFaceNX = NULL;
-	_depthCubeFaceNY = NULL;
-	_depthCubeFaceNZ = NULL;
 	_lightMoveSpeed = 0.01f;
 	_font = NULL;
 	_fontDesc = D3DXFONT_DESC();
@@ -97,48 +90,9 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 
 	D3DXCreateFontIndirect(_pd3dDevice,&_fontDesc,&_font);
 
-	if( FAILED(D3DXCreateCubeTexture(_pd3dDevice, 512, 1, D3DUSAGE_RENDERTARGET, 
-		D3DFMT_R32F, D3DPOOL_DEFAULT, &_cubicShadowMap)) )
-	{
-		if( FAILED(D3DXCreateCubeTexture(_pd3dDevice, 512, 1, D3DUSAGE_RENDERTARGET, 
-			D3DFMT_R16F, D3DPOOL_DEFAULT, &_cubicShadowMap)) )
-		{
-			MessageBoxA(NULL, "Creating cubic shadow map failed.", "BOOM!", MB_OK);
-			return false;
-		}
+	D3DXVECTOR3 initialCamPos = D3DXVECTOR3(0.0f, 30.0f, 0.0f);
 
-	}
-
-	if( FAILED(_cubicShadowMap->GetCubeMapSurface(D3DCUBEMAP_FACE_POSITIVE_X, 0, &_depthCubeFacePX)) )
-	{
-		MessageBoxA(NULL, "Creating cubic shadow map 1 failed.", "BOOM!", MB_OK);
-		return false;
-	}
-	if( FAILED(_cubicShadowMap->GetCubeMapSurface(D3DCUBEMAP_FACE_POSITIVE_Y, 0, &_depthCubeFacePY)) )
-	{
-		MessageBoxA(NULL, "Creating cubic shadow map 2 failed.", "BOOM!", MB_OK);
-		return false;
-	}
-	if( FAILED(_cubicShadowMap->GetCubeMapSurface(D3DCUBEMAP_FACE_POSITIVE_Z, 0, &_depthCubeFacePZ)) )
-	{
-		MessageBoxA(NULL, "Creating cubic shadow map 3 failed.", "BOOM!", MB_OK);
-		return false;
-	}
-	if( FAILED(_cubicShadowMap->GetCubeMapSurface(D3DCUBEMAP_FACE_NEGATIVE_X, 0, &_depthCubeFaceNX)) )
-	{
-		MessageBoxA(NULL, "Creating cubic shadow map 4 failed.", "BOOM!", MB_OK);
-		return false;
-	}
-	if( FAILED(_cubicShadowMap->GetCubeMapSurface(D3DCUBEMAP_FACE_NEGATIVE_Y, 0, &_depthCubeFaceNY)) )
-	{
-		MessageBoxA(NULL, "Creating cubic shadow map 5 failed.", "BOOM!", MB_OK);
-		return false;
-	}
-	if( FAILED(_cubicShadowMap->GetCubeMapSurface(D3DCUBEMAP_FACE_NEGATIVE_Z, 0, &_depthCubeFaceNZ)) )
-	{
-		MessageBoxA(NULL, "Creating cubic shadow map 6 failed.", "BOOM!", MB_OK);
-		return false;
-	}
+	_pLight = new Light(_pd3dDevice, &initialCamPos, (D3DX_PI / 2.0f), 1.0f, 1.0f, 500.0f);
 
 	_pShadowEffect = new ShadowEffect(&_pd3dDevice, "shadowEffect.fx");
 	if( !(_pShadowEffect->SetUp()) )
@@ -147,18 +101,16 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 		return false;
 	}
 
-	D3DXVECTOR3 initialCamPos = D3DXVECTOR3(0.0f, 30.0f, 0.0f);
 	_pMainCamera = new PlayerCamera(&initialCamPos, D3DX_PI / 2.0f, ((float)screenWidth / (float)screenHeight), 
 									1.0f, 500.0f, 20.0f, _pInput);
 
-	_pLight = new Light(&initialCamPos, (D3DX_PI / 2.0f), 1.0f, 1.0f, 500.0f);
 
 	D3DXVECTOR3 teapotPos = D3DXVECTOR3(0.0f, 0.0f, 30.0f);
 	D3DXVECTOR3 spherePos = D3DXVECTOR3(0.0f, 10.0f, 50.0f);
 	D3DXVECTOR3 groundPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	D3DXVECTOR3 lightPos = D3DXVECTOR3(0.0f, 20.0f, 0.0f);
 
-	_pTeapot = new Mesh(_pd3dDevice, teapotPos, "teapot.x");
+	_pTeapot = new Mesh(_pd3dDevice, teapotPos, "head.x");
 	if( !(_pTeapot->Load()) )
 	{
 		MessageBoxA(NULL, "loading teapot mesh failed.", "BOOM!", MB_OK);
@@ -257,17 +209,17 @@ void Environment::FillCubicShadowMap()
 	_pShadowEffect->_pEffect->Begin(&numOfPasses, NULL);
 
 	_pLight->SetCameraToPositiveX();
-	RenderDepthToCubeFace(_depthCubeFacePX);
+	RenderDepthToCubeFace(_pLight->_depthCubeFacePX);
 	_pLight->SetCameraToPositiveY();
-	RenderDepthToCubeFace(_depthCubeFacePY);
+	RenderDepthToCubeFace(_pLight->_depthCubeFacePY);
 	_pLight->SetCameraToPositiveZ();
-	RenderDepthToCubeFace(_depthCubeFacePZ);
+	RenderDepthToCubeFace(_pLight->_depthCubeFacePZ);
 	_pLight->SetCameraToNegativeX();
-	RenderDepthToCubeFace(_depthCubeFaceNX);
+	RenderDepthToCubeFace(_pLight->_depthCubeFaceNX);
 	_pLight->SetCameraToNegativeY();
-	RenderDepthToCubeFace(_depthCubeFaceNY);
+	RenderDepthToCubeFace(_pLight->_depthCubeFaceNY);
 	_pLight->SetCameraToNegativeZ();
-	RenderDepthToCubeFace(_depthCubeFaceNZ);
+	RenderDepthToCubeFace(_pLight->_depthCubeFaceNZ);
 
 	_pShadowEffect->_pEffect->End();
 
@@ -290,7 +242,7 @@ void Environment::RenderSceneWithShadowMap()
 		_pd3dDevice->Clear(NULL, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00000000, 1.0f, NULL);
 	}
 
-	_pShadowEffect->_pEffect->SetTexture(_pShadowEffect->_cubeShadowMapHandle, _cubicShadowMap);
+	_pShadowEffect->_pEffect->SetTexture(_pShadowEffect->_cubeShadowMapHandle, _pLight->CubicShadowMap);
 	_pShadowEffect->_pEffect->SetTechnique(_pShadowEffect->_cubicShadowMappingHandle);
 
 	_pShadowEffect->_pEffect->Begin(&numOfPasses, NULL);
@@ -345,7 +297,6 @@ void Environment::CleanUp()
 		_pBackBufferSurface->Release();
 		_pBackBufferSurface = NULL;
 	}
-
 	if( _pInput != NULL )
 	{
 		_pInput->CleanUp();
@@ -392,42 +343,6 @@ void Environment::CleanUp()
 		_pLightMesh->CleanUp();
 		delete _pLightMesh;
 		_pLightMesh = NULL;
-	}
-
-	if( _cubicShadowMap != NULL )
-	{
-		_cubicShadowMap->Release();
-		_cubicShadowMap = NULL;
-	}
-	if( _depthCubeFacePX != NULL )
-	{
-		_depthCubeFacePX->Release();
-		_depthCubeFacePX = NULL;
-	}
-	if( _depthCubeFacePY != NULL )
-	{
-		_depthCubeFacePY->Release();
-		_depthCubeFacePY = NULL;
-	}
-	if( _depthCubeFacePZ != NULL )
-	{
-		_depthCubeFacePZ->Release();
-		_depthCubeFacePZ = NULL;
-	}
-	if( _depthCubeFaceNX != NULL )
-	{
-		_depthCubeFaceNX->Release();
-		_depthCubeFaceNX = NULL;
-	}
-	if( _depthCubeFaceNY != NULL )
-	{
-		_depthCubeFaceNY->Release();
-		_depthCubeFaceNY = NULL;
-	}
-	if( _depthCubeFaceNZ != NULL )
-	{
-		_depthCubeFaceNZ->Release();
-		_depthCubeFaceNZ = NULL;
 	}
 	if(_font != NULL)
 	{

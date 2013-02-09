@@ -12,7 +12,7 @@ public:
 
 	D3DXVECTOR3* GetPosition();
 	D3DXVECTOR4* GetPosition4();
-	void SetPosition(D3DXVECTOR3* inPosition);
+	void SetPosition(D3DXVECTOR3* position);
 
 	void UpdateViewProjectionMatrix();
 

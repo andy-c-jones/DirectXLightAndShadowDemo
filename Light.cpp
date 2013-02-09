@@ -47,3 +47,42 @@ void Light::SetCameraToNegativeZ()
 	SetRight(&_negativeLookX);
 	UpdateViewProjectionMatrix();
 }
+
+void Light::CleanUp()
+{
+	if( CubicShadowMap != NULL )
+	{
+		CubicShadowMap->Release();
+		CubicShadowMap = NULL;
+	}
+	if( _depthCubeFacePX != NULL )
+	{
+		_depthCubeFacePX->Release();
+		_depthCubeFacePX = NULL;
+	}
+	if( _depthCubeFacePY != NULL )
+	{
+		_depthCubeFacePY->Release();
+		_depthCubeFacePY = NULL;
+	}
+	if( _depthCubeFacePZ != NULL )
+	{
+		_depthCubeFacePZ->Release();
+		_depthCubeFacePZ = NULL;
+	}
+	if( _depthCubeFaceNX != NULL )
+	{
+		_depthCubeFaceNX->Release();
+		_depthCubeFaceNX = NULL;
+	}
+	if( _depthCubeFaceNY != NULL )
+	{
+		_depthCubeFaceNY->Release();
+		_depthCubeFaceNY = NULL;
+	}
+	if( _depthCubeFaceNZ != NULL )
+	{
+		_depthCubeFaceNZ->Release();
+		_depthCubeFaceNZ = NULL;
+	}
+}

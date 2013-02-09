@@ -21,13 +21,7 @@ class Environment
 	Mesh* _pGround;
 	Mesh* _pLightMesh;
 
-	IDirect3DCubeTexture9* _cubicShadowMap;
-	IDirect3DSurface9* _depthCubeFacePX;
-	IDirect3DSurface9* _depthCubeFacePY;
-	IDirect3DSurface9* _depthCubeFacePZ;
-	IDirect3DSurface9* _depthCubeFaceNX;
-	IDirect3DSurface9* _depthCubeFaceNY;
-	IDirect3DSurface9* _depthCubeFaceNZ;
+
 
 	LPD3DXFONT _font; 
 	D3DXFONT_DESC _fontDesc;

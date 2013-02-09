@@ -65,5 +65,14 @@
     <None Include="teapot.x">
       <Filter>Data</Filter>
     </None>
+    <None Include="monkey.x">
+      <Filter>Data</Filter>
+    </None>
+    <None Include="teapot2.x">
+      <Filter>Data</Filter>
+    </None>
+    <None Include="head.x">
+      <Filter>Data</Filter>
+    </None>
   </ItemGroup>
 </Project>
