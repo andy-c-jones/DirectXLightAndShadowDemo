@@ -13,7 +13,8 @@ const float4 lightAttenuation = float4(0.0f, 0.05f, 0.0f, 1.0f);
 
 const float specPower = 64.0f;
 
-float4 lightPosition;
+int lightNumber;
+float4 lightPosition[1];
 float4 eyePosition;
 
 #define zOffset 0.5f 
@@ -43,7 +44,7 @@ lightFuncOutput LightPointSH(float3 inObjPos,
      output.specularResult = float4(0.0f, 0.0f, 0.0f, 1.0f);
 
      float4 PLightDirection = 0.0f;
-     PLightDirection.xyz = lightPosition.xyz - inObjPos;
+     PLightDirection.xyz = lightPosition[0].xyz - inObjPos;
      float distance = length(PLightDirection.xyz);
      PLightDirection.xyz = PLightDirection.xyz / distance;
     
@@ -89,7 +90,7 @@ VS_OUTPUT_DEPTH depthMap_VS( float4 inPosition : POSITION )
     float4 positionW = mul( inPosition, worldMat );
     output.oPositionLight = mul( inPosition, worldViewProjMat );
     
-    output.lightVec = lightPosition - positionW.xyz; 
+    output.lightVec = lightPosition[0] - positionW.xyz; 
 
     return output;
 }

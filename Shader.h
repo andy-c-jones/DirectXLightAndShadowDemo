@@ -10,13 +10,13 @@ protected:
 	std::string _effectFileName;
 
 public:
-	ID3DXEffect* _pEffect;
+	ID3DXEffect* Effect;
 
 	Shader(IDirect3DDevice9** device, std::string effectFileName) 
 	{
 		_pd3dDevice = *device;
 		_effectFileName = effectFileName;
-		_pEffect = NULL;
+		Effect = NULL;
 		_pErrorBuffer = NULL;
 	}
 

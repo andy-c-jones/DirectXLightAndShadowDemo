@@ -41,11 +41,11 @@ void Mesh::RenderAmbient(D3DXMATRIXA16* viewProjectionMatrix, ShadowEffect* shad
 {
 	D3DXMATRIXA16 worldViewProjMat;
 	D3DXMatrixMultiply(&worldViewProjMat, &_worldMatrix, viewProjectionMatrix);
-	shadowMapper->_pEffect->SetMatrix(shadowMapper->_worldViewProjMatHandle, &worldViewProjMat);
+	shadowMapper->Effect->SetMatrix(shadowMapper->WorldViewProjMatHandle, &worldViewProjMat);
 
-	shadowMapper->_pEffect->BeginPass(0);
+	shadowMapper->Effect->BeginPass(0);
 	_pMesh->DrawSubset(0);
-	shadowMapper->_pEffect->EndPass();
+	shadowMapper->Effect->EndPass();
 }
 
 void Mesh::RenderMeshWithShadowCube(D3DXMATRIXA16* viewProjectionMatrix, ShadowEffect* shadowMapper)
@@ -53,12 +53,12 @@ void Mesh::RenderMeshWithShadowCube(D3DXMATRIXA16* viewProjectionMatrix, ShadowE
 	D3DXMATRIXA16 worldViewProjMat;
 	D3DXMatrixMultiply(&worldViewProjMat, &_worldMatrix, viewProjectionMatrix);
 
-	shadowMapper->_pEffect->SetMatrix(shadowMapper->_worldViewProjMatHandle, &worldViewProjMat);
-	shadowMapper->_pEffect->SetMatrix(shadowMapper->_worldMatHandle, &_worldMatrix);
+	shadowMapper->Effect->SetMatrix(shadowMapper->WorldViewProjMatHandle, &worldViewProjMat);
+	shadowMapper->Effect->SetMatrix(shadowMapper->WorldMatrixHandle, &_worldMatrix);
 
-	shadowMapper->_pEffect->BeginPass(0);
+	shadowMapper->Effect->BeginPass(0);
 	_pMesh->DrawSubset(0);
-	shadowMapper->_pEffect->EndPass();
+	shadowMapper->Effect->EndPass();
 }
 
 void Mesh::CleanUp()

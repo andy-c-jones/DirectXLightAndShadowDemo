@@ -2,29 +2,30 @@
 
 void ShadowEffect::GetHandles()
 {
-	_depthMapHandle = _pEffect->GetTechniqueByName("depthMap");
-	_cubicShadowMappingHandle = _pEffect->GetTechniqueByName("cubicShadowMapping");
-	_ambientHandle = _pEffect->GetTechniqueByName("ambient");
-	_worldMatHandle = _pEffect->GetParameterByName(NULL, "worldMat");
-	_worldViewProjMatHandle = _pEffect->GetParameterByName(NULL, "worldViewProjMat");
-	_cubeShadowMapHandle = _pEffect->GetParameterByName(NULL, "cubeShadowMap");
-	_eyePositionHandle = _pEffect->GetParameterByName(NULL, "eyePosition");
-	_lightPositionHandle = _pEffect->GetParameterByName(NULL, "lightPosition");
+	DepthMapHandle = Effect->GetTechniqueByName("depthMap");
+	CubicShadowMappingHandle = Effect->GetTechniqueByName("cubicShadowMapping");
+	AmbientHandle = Effect->GetTechniqueByName("ambient");
+	WorldMatrixHandle = Effect->GetParameterByName(NULL, "worldMat");
+	WorldViewProjMatHandle = Effect->GetParameterByName(NULL, "worldViewProjMat");
+	CubeShadowMapHandle = Effect->GetParameterByName(NULL, "cubeShadowMap");
+	EyePositionHandle = Effect->GetParameterByName(NULL, "eyePosition");
+	LightPositionHandle = Effect->GetParameterByName(NULL, "lightPosition");
+	LightNumberHandle = Effect->GetParameterByName(NULL, "lightNumber");
 }
 
 bool ShadowEffect::ValidateTechniques()
 {
-	if(FAILED(_pEffect->ValidateTechnique(_depthMapHandle)))
+	if(FAILED(Effect->ValidateTechnique(DepthMapHandle)))
 	{
 		MessageBoxA(NULL, "depth map technique validation failed.", NULL, MB_OK);
 		return false;
 	}
-	if(FAILED(_pEffect->ValidateTechnique(_cubicShadowMappingHandle)))
+	if(FAILED(Effect->ValidateTechnique(CubicShadowMappingHandle)))
 	{
 		MessageBoxA(NULL, "cubic shadow mapping technique validation failed.", NULL, MB_OK);
 		return false;
 	}
-	if(FAILED(_pEffect->ValidateTechnique(_ambientHandle)))
+	if(FAILED(Effect->ValidateTechnique(AmbientHandle)))
 	{
 		MessageBoxA(NULL, "ambient technique validation failed.", NULL, MB_OK);
 		return false;

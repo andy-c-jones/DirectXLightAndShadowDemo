@@ -2,7 +2,7 @@
 
 bool Shader::Initialise()
 {
-	if(FAILED(D3DXCreateEffectFromFile(_pd3dDevice, _effectFileName.c_str(), NULL,  NULL, D3DXSHADER_DEBUG, NULL, &_pEffect, &_pErrorBuffer)))
+	if(FAILED(D3DXCreateEffectFromFile(_pd3dDevice, _effectFileName.c_str(), NULL,  NULL, D3DXSHADER_DEBUG, NULL, &Effect, &_pErrorBuffer)))
 	{
 		if(_pErrorBuffer)
 		{
@@ -15,10 +15,10 @@ bool Shader::Initialise()
 
 void Shader::CleanUp()
 {
-	if(_pEffect != NULL)
+	if(Effect != NULL)
 	{
-		_pEffect->Release();
-		_pEffect = NULL;
+		Effect->Release();
+		Effect = NULL;
 	}
 	if(_pErrorBuffer != NULL)
 	{
