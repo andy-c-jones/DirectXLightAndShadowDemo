@@ -12,9 +12,10 @@ const float4 lightSpecular = float4(0.3f, 0.3f, 0.3f, 1.0f);
 const float4 lightAttenuation = float4(0.0f, 0.05f, 0.0f, 1.0f);
 
 const float specPower = 64.0f;
-
+const static int NUMBER_OF_LIGHTS = 1;
 int lightNumber;
-float4 lightPosition[1];
+float4 lightPosition[NUMBER_OF_LIGHTS];
+float4 shadowLightPosition;
 float4 eyePosition;
 
 #define zOffset 0.5f 
@@ -31,8 +32,8 @@ samplerCUBE cubeShadowMapSampler = sampler_state
 
 struct lightFuncOutput
 {
-    float4 diffuseResult[1];
-    float4 specularResult[1];
+    float4 diffuseResult[NUMBER_OF_LIGHTS];
+    float4 specularResult[NUMBER_OF_LIGHTS];
 };
 
 lightFuncOutput LightPointSH(float3 inObjPos, 
@@ -40,33 +41,33 @@ lightFuncOutput LightPointSH(float3 inObjPos,
 						     float3 inCam2Vertex)
 {
      lightFuncOutput output;
-     output.diffuseResult[0] = float4(0.0f, 0.0f, 0.0f, 1.0f);
-     output.specularResult[0] = float4(0.0f, 0.0f, 0.0f, 1.0f);
 
-     float4 PLightDirection = 0.0f;
-     PLightDirection.xyz = lightPosition[0].xyz - inObjPos;
-     float distance = length(PLightDirection.xyz);
-     PLightDirection.xyz = PLightDirection.xyz / distance;
+	 for(int i = 0; i < NUMBER_OF_LIGHTS; i++)
+	 {
+		output.diffuseResult[0] = float4(0.0f, 0.0f, 0.0f, 1.0f);
+		output.specularResult[0] = float4(0.0f, 0.0f, 0.0f, 1.0f);
+
+		float4 PLightDirection = 0.0f;
+		PLightDirection.xyz = lightPosition[0].xyz - inObjPos;
+		float distance = length(PLightDirection.xyz);
+		 PLightDirection.xyz = PLightDirection.xyz / distance;
     
-     PLightDirection.w = max(0, 1 / (lightAttenuation.x + 
-     	                      		 lightAttenuation.y * distance + 
-                               		 lightAttenuation.z * distance * distance) );
+		PLightDirection.w = max(0, 1 / (lightAttenuation.x + 
+     	                      			lightAttenuation.y * distance + 
+                               			lightAttenuation.z * distance * distance) );
      
-	 float shadowMapDepth = texCUBE(cubeShadowMapSampler, float4(-(PLightDirection.xyz), 0.0f)).x;
+		float shadowMapDepth = texCUBE(cubeShadowMapSampler, float4(-(PLightDirection.xyz), 0.0f)).x;
 	 
-	 if(distance > shadowMapDepth)    
-	 {
-	 	 return output;
-	 }     	
-	 else
-	 {
-	     float3 floatVecTmp = normalize(inCam2Vertex + PLightDirection.xyz);
+		if(distance <= shadowMapDepth)    
+		{
+			float3 floatVecTmp = normalize(inCam2Vertex + PLightDirection.xyz);
 
-         output.diffuseResult[0] = PLightDirection.w * lightDiffuse * max(0, dot(inNormal, PLightDirection.xyz));
-         output.specularResult[0] = PLightDirection.w * lightSpecular * pow(max (0, dot(inNormal, floatVecTmp) ), specPower);
-
-         return output;
+			output.diffuseResult[0] = PLightDirection.w * lightDiffuse * max(0, dot(inNormal, PLightDirection.xyz));
+			output.specularResult[0] = PLightDirection.w * lightSpecular * pow(max (0, dot(inNormal, floatVecTmp) ), specPower);
+		}     	
 	 }
+
+	 return output;
 }
 
 struct VS_OUTPUT
@@ -86,18 +87,16 @@ struct VS_OUTPUT_DEPTH
 VS_OUTPUT_DEPTH depthMap_VS( float4 inPosition : POSITION )
 {
     VS_OUTPUT_DEPTH output;
-    
+
     float4 positionW = mul( inPosition, worldMat );
     output.oPositionLight = mul( inPosition, worldViewProjMat );
-    
-    output.lightVec = lightPosition[0] - positionW.xyz; 
+	output.lightVec = shadowLightPosition - positionW.xyz;
 
     return output;
 }
 
 VS_OUTPUT cubicShadowMapping_VS(float4 inPosition  : POSITION,
                                 float3 inNormal    : NORMAL)
-                         
 {
     VS_OUTPUT output;
 
@@ -131,6 +130,7 @@ float4 cubicShadowMapping_PS(VS_OUTPUT In) : COLOR0
     lightResult = LightPointSH(In.worldPos, normal, cam2Vert);
     
     float4 ambient = materialAmbient * globalAmbient;
+
     float4 diffuse = materialDiffuse * lightResult.diffuseResult[0];
     float4 specular = materialSpecular * lightResult.specularResult[0];
 

@@ -136,7 +136,7 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 		return false;
 	}
 
-	_lightPosition = lightPos;
+	_lightPosition[0] = lightPos;
 
 	return true;
 }
@@ -146,19 +146,19 @@ void Environment::OnFrameMove(DWORD inTimeDelta)
 	_pInput->GetInputData();
 	_pMainCamera->UpdateCamera((float)(inTimeDelta / 1000.0f));
 
-	if (_lightPosition.x > 75 || _lightPosition.x < -75)
+	if (_lightPosition[0].x > 75 || _lightPosition[0].x < -75)
 	{
 		_lightMoveSpeed = -_lightMoveSpeed;
 	}
 
-	_lightPosition.x += _lightMoveSpeed;
+	_lightPosition[0].x += _lightMoveSpeed;
 	int lightNumber = 1;
 
-	_pShadowEffect->Effect->SetVectorArray(_pShadowEffect->LightPositionHandle, &D3DXVECTOR4(_lightPosition, 1.0f), 1);
+	_pShadowEffect->Effect->SetVectorArray(_pShadowEffect->LightPositionHandle, &D3DXVECTOR4(_lightPosition[0], 1.0f), 1);
 	_pShadowEffect->Effect->SetInt(_pShadowEffect->LightPositionHandle, lightNumber);
 
-	_pLight->SetPosition(&_lightPosition);
-	_pLightMesh->Translate(_lightPosition.x, _lightPosition.y, _lightPosition.z);
+	_pLight->SetPosition(&_lightPosition[0]);
+	_pLightMesh->Translate(_lightPosition[0].x, _lightPosition[0].y, _lightPosition[0].z);
 
 	_pShadowEffect->Effect->SetVector(_pShadowEffect->EyePositionHandle, _pMainCamera->GetPosition4());
 }
@@ -207,7 +207,7 @@ void Environment::FillCubicShadowMap()
 	{
 		return;
 	}
-
+	_pShadowEffect->Effect->SetVector(_pShadowEffect->ShadowPositionHandle, &D3DXVECTOR4(_lightPosition[0], 1.0f));
 	_pShadowEffect->Effect->SetTechnique(_pShadowEffect->DepthMapHandle);
 	_pShadowEffect->Effect->Begin(&numOfPasses, NULL);
 

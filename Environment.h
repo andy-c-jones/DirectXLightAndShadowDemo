@@ -14,7 +14,7 @@ class Environment
 	PlayerCamera* _pMainCamera;
 	Light* _pLight;
 	ShadowEffect* _pShadowEffect;
-	D3DXVECTOR3 _lightPosition;
+	D3DXVECTOR3 _lightPosition[1];
 
 	Mesh* _pTeapot;
 	Mesh* _pSphere;

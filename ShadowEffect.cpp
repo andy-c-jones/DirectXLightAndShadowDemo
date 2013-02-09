@@ -11,6 +11,7 @@ void ShadowEffect::GetHandles()
 	EyePositionHandle = Effect->GetParameterByName(NULL, "eyePosition");
 	LightPositionHandle = Effect->GetParameterByName(NULL, "lightPosition");
 	LightNumberHandle = Effect->GetParameterByName(NULL, "lightNumber");
+	ShadowPositionHandle = Effect->GetParameterByName(NULL, "shadowLightPosition");
 }
 
 bool ShadowEffect::ValidateTechniques()

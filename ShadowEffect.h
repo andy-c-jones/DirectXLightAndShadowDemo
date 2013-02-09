@@ -16,15 +16,16 @@ public:
 	D3DXHANDLE EyePositionHandle;
 	D3DXHANDLE LightPositionHandle;
 	D3DXHANDLE LightNumberHandle;
+	D3DXHANDLE ShadowPositionHandle;
+
 
 	ShadowEffect(LPDIRECT3DDEVICE9* device, std::string effectFileName) 
 		: Shader(device, effectFileName)
 	{
-
 	}
+
 	~ShadowEffect()
 	{
-
 	}
 
 	bool SetUp();
