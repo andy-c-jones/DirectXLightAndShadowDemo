@@ -24,7 +24,13 @@ Environment::Environment(Input* input)
 	_depthCubeFaceNY = NULL;
 	_depthCubeFaceNZ = NULL;
 	_lightMoveSpeed = 0.01f;
+	_font = NULL;
+	_fontDesc = D3DXFONT_DESC();
 
+	_fontPosition.top = 10;
+	_fontPosition.left = 10;
+	_fontPosition.right = 200;
+	_fontPosition.bottom = 200;
 	_pInput = input;
 }
 
@@ -42,20 +48,6 @@ bool Environment::InitialiseDirectX( HWND hWnd, UINT screenWidth, UINT screenHei
 	{
 		return false;
 	}
-
-	for (UINT Adapter = 0; Adapter < _pD3D->GetAdapterCount(); Adapter++)
-	{
-		D3DADAPTER_IDENTIFIER9 Identifier;
-		HRESULT Res;
-		Res = _pD3D->GetAdapterIdentifier(Adapter, 0, &Identifier);
-		if (strstr(Identifier.Description, "PerfHUD") != 0)
-		{
-			AdapterToUse = Adapter;
-			DeviceType = D3DDEVTYPE_REF;
-			break;
-		}
-	}
-
 	D3DPRESENT_PARAMETERS d3dpp;
 	ZeroMemory( &d3dpp, sizeof(d3dpp) );
 	d3dpp.BackBufferWidth = screenWidth;
@@ -102,6 +94,8 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 		MessageBoxA(NULL, "Direct3d initialization failed.", NULL, MB_OK);
 		return false;
 	}
+
+	D3DXCreateFontIndirect(_pd3dDevice,&_fontDesc,&_font);
 
 	if( FAILED(D3DXCreateCubeTexture(_pd3dDevice, 512, 1, D3DUSAGE_RENDERTARGET, 
 		D3DFMT_R32F, D3DPOOL_DEFAULT, &_cubicShadowMap)) )
@@ -238,9 +232,9 @@ void Environment::RenderDepthToCubeFace(IDirect3DSurface9* cubeFaceSurface)
 	_pShadowEffect->_pEffect->SetMatrix(_pShadowEffect->_worldMatHandle, _pTeapot->GetWorldMat());
 	_pShadowEffect->_pEffect->SetMatrix(_pShadowEffect->_worldViewProjMatHandle, &worldViewProjectionMatrix);
 
-	//_pShadowEffect->_pEffect->BeginPass(0);
-	//_pTeapot->_pMesh->DrawSubset(0);
-	//_pShadowEffect->_pEffect->EndPass();
+	_pShadowEffect->_pEffect->BeginPass(0);
+	_pTeapot->_pMesh->DrawSubset(0);
+	_pShadowEffect->_pEffect->EndPass();
 
 	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pSphere->GetWorldMat(), _pLight->GetViewProjectionMatrix());
 	_pShadowEffect->_pEffect->SetMatrix(_pShadowEffect->_worldMatHandle, _pSphere->GetWorldMat());
@@ -301,19 +295,19 @@ void Environment::RenderSceneWithShadowMap()
 
 	_pShadowEffect->_pEffect->Begin(&numOfPasses, NULL);
 	_pSphere->RenderMeshWithShadowCube(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
-	//_pTeapot->RenderMeshWithShadowCube(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
+	_pTeapot->RenderMeshWithShadowCube(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
 	_pGround->RenderMeshWithShadowCube(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
 	_pShadowEffect->_pEffect->End();
 
 	_pShadowEffect->_pEffect->SetTechnique(_pShadowEffect->_ambientHandle);
 
 
-	//_pShadowEffect->_pEffect->Begin(&numOfPasses, NULL);
-	//_pLightMesh->RenderAmbient(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
-	//_pShadowEffect->_pEffect->End();
+	_pShadowEffect->_pEffect->Begin(&numOfPasses, NULL);
+	_pLightMesh->RenderAmbient(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
+	_pShadowEffect->_pEffect->End();
 }
 
-void Environment::Render(DWORD inTimeDelta)
+void Environment::Render(DWORD inTimeDelta, std::string fps)
 {
 	OnFrameMove(inTimeDelta);
 
@@ -321,6 +315,13 @@ void Environment::Render(DWORD inTimeDelta)
 	{
 		FillCubicShadowMap();
 		RenderSceneWithShadowMap();
+
+		_font->DrawText(NULL,
+			fps.c_str(),
+			-1,
+			&_fontPosition,
+			DT_LEFT,
+			0xffffffff);
 	}
 	_pd3dDevice->EndScene();
 
@@ -427,5 +428,10 @@ void Environment::CleanUp()
 	{
 		_depthCubeFaceNZ->Release();
 		_depthCubeFaceNZ = NULL;
+	}
+	if(_font != NULL)
+	{
+		_font->Release();
+		_font = NULL;
 	}
 }

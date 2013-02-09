@@ -29,7 +29,9 @@ class Environment
 	IDirect3DSurface9* _depthCubeFaceNY;
 	IDirect3DSurface9* _depthCubeFaceNZ;
 
-
+	LPD3DXFONT _font; 
+	D3DXFONT_DESC _fontDesc;
+	RECT _fontPosition;
 
 	float _lightMoveSpeed;
 
@@ -45,6 +47,6 @@ public:
 	~Environment();
 
 	bool Initialise(HWND hWnd, HINSTANCE inInstance, UINT inScreenWidth, UINT inScreenHeight, BOOL inWindowed);
-	void Render(DWORD inTimeDelta);
+	void Render(DWORD inTimeDelta, std::string fps);
 	void CleanUp();
 };

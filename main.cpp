@@ -86,7 +86,7 @@ INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )
 		else
 		{
 			timeManager.UpdateLastTime();
-			game.Render(timeManager.GetTimeDelta());
+			game.Render(timeManager.GetTimeDelta(), timeManager.GetFPS(timeManager.GetTimeDelta()));
 			timeManager.UpdateCurrentTime();
 			timeManager.UpdateTimeDelta();
 		}

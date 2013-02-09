@@ -48,7 +48,7 @@ DWORD TimeManager::GetTimeDelta()
 	return _timeDelta;
 }
 
-std::string* TimeManager::GetFPS(DWORD inTimeDelta)
+std::string TimeManager::GetFPS(DWORD inTimeDelta)
 {
 	_frameCount++;
 	_timeElapsed += inTimeDelta;
@@ -63,7 +63,7 @@ std::string* TimeManager::GetFPS(DWORD inTimeDelta)
 		_stringFps = "FPS: " + std::string(_pCharBuffer);
 	}
 
-	return &_stringFps;
+	return _stringFps;
 }
 
 void TimeManager::CleanUp()

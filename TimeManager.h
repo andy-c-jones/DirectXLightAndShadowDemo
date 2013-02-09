@@ -30,7 +30,7 @@ public:
 	void UpdateTimeDelta();
 	DWORD GetTimeDelta();
 	
-	std::string* GetFPS(DWORD inTimeDelta);
+	std::string GetFPS(DWORD inTimeDelta);
 
 	void CleanUp();
 };
