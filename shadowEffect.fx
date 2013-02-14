@@ -1,6 +1,7 @@
 float4x4 worldMat; 
 float4x4 worldViewProjMat;
 textureCUBE cubeShadowMap; 
+textureCUBE cubeShadowMap2; 
 
 const float4 materialAmbient = float4(0.9f, 0.9f, 0.9f, 1.0f);  
 const float4 materialDiffuse = float4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -23,6 +24,16 @@ float4 eyePosition;
 samplerCUBE cubeShadowMapSampler = sampler_state
 {
 	Texture = <cubeShadowMap>;
+    MipFilter = NONE;
+    MinFilter = NONE;
+    MagFilter = NONE;
+    AddressU = wrap;
+    AddressV = wrap;
+};
+
+samplerCUBE cubeShadowMapSampler2 = sampler_state
+{
+	Texture = <cubeShadowMap2>;
     MipFilter = NONE;
     MinFilter = NONE;
     MagFilter = NONE;
@@ -55,8 +66,15 @@ lightFuncOutput LightPointSH(float3 inObjPos,
 		PLightDirection.w = max(0, 1 / (lightAttenuation.x + 
      	                      			lightAttenuation.y * distance + 
                                			lightAttenuation.z * distance * distance) );
-     
-		float shadowMapDepth = texCUBE(cubeShadowMapSampler, float4(-(PLightDirection.xyz), 0.0f)).x;
+        float shadowMapDepth;
+		if(i == 0)
+		{
+			shadowMapDepth = texCUBE(cubeShadowMapSampler, float4(-(PLightDirection.xyz), 0.0f)).x;
+		}
+		else
+		{
+			shadowMapDepth = texCUBE(cubeShadowMapSampler2, float4(-(PLightDirection.xyz), 0.0f)).x;
+		}
 	 
 		if(distance <= shadowMapDepth)    
 		{
@@ -130,9 +148,21 @@ float4 cubicShadowMapping_PS(VS_OUTPUT In) : COLOR0
     lightResult = LightPointSH(In.worldPos, normal, cam2Vert);
     
     float4 ambient = materialAmbient * globalAmbient;
+	float4 diffuse = float4(0,0,0,0);
+	float4 tempDiffuse = float4(0,0,0,0);
+	for(int i = 0; i < NUMBER_OF_LIGHTS; i++)
+	{
+		tempDiffuse = materialDiffuse * lightResult.diffuseResult[i];
+		diffuse += tempDiffuse / NUMBER_OF_LIGHTS;
+	}
 
-    float4 diffuse = materialDiffuse * lightResult.diffuseResult[0];
-    float4 specular = materialSpecular * lightResult.specularResult[0];
+	float4 specular = float4(0,0,0,0);
+	float4 tempSpecular = float4(0,0,0,0);
+	for(int i = 0; i < NUMBER_OF_LIGHTS; i++)
+	{
+		tempSpecular = materialSpecular * lightResult.specularResult[i];
+		specular += tempSpecular / NUMBER_OF_LIGHTS;
+	}
 
     float4 lightingColour = (ambient * (diffuse + specular));
     

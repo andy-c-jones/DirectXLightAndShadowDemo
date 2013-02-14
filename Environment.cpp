@@ -8,7 +8,7 @@ Environment::Environment(Input* input)
 
 	_pInput = NULL;  
 	_pMainCamera = NULL;
-	_pLight = NULL;
+	_pLight[0] = NULL;
 	_pShadowEffect = NULL;
 
 	_pTeapot = NULL;
@@ -84,7 +84,7 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 {
 	if( !(InitialiseDirectX(hWnd, screenWidth, screenHeight, windowed)) )
 	{
-		MessageBoxA(NULL, "Direct3d initialization failed.", NULL, MB_OK);
+		MessageBoxA(NULL, "Direct3d initialisation failed.", NULL, MB_OK);
 		return false;
 	}
 
@@ -92,12 +92,12 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 
 	D3DXVECTOR3 initialCamPos = D3DXVECTOR3(0.0f, 30.0f, 0.0f);
 
-	_pLight = new Light(_pd3dDevice, &initialCamPos, (D3DX_PI / 2.0f), 1.0f, 1.0f, 500.0f);
+	_pLight[0] = new Light(_pd3dDevice, &initialCamPos, (D3DX_PI / 2.0f), 1.0f, 1.0f, 500.0f);
 
 	_pShadowEffect = new ShadowEffect(&_pd3dDevice, "shadowEffect.fx");
 	if( !(_pShadowEffect->SetUp()) )
 	{
-		MessageBoxA(NULL, "loading and initializing the shadowing effect failed", "BOOM!", MB_OK);
+		MessageBoxA(NULL, "loading and initialising the shadowing effect failed", "BOOM!", MB_OK);
 		return false;
 	}
 
@@ -157,8 +157,8 @@ void Environment::OnFrameMove(DWORD inTimeDelta)
 	_pShadowEffect->Effect->SetVectorArray(_pShadowEffect->LightPositionHandle, &D3DXVECTOR4(_lightPosition[0], 1.0f), 1);
 	_pShadowEffect->Effect->SetInt(_pShadowEffect->LightPositionHandle, lightNumber);
 
-	_pLight->SetPosition(&_lightPosition[0]);
-	_pLightMesh->Translate(_pLight->GetPosition()->x, _pLight->GetPosition()->y, _pLight->GetPosition()->z);
+	_pLight[0]->SetPosition(&_lightPosition[0]);
+	_pLightMesh->Translate(_pLight[0]->GetPosition()->x, _pLight[0]->GetPosition()->y, _pLight[0]->GetPosition()->z);
 
 	_pShadowEffect->Effect->SetVector(_pShadowEffect->EyePositionHandle, _pMainCamera->GetPosition4());
 }
@@ -175,7 +175,7 @@ void Environment::RenderDepthToCubeFace(IDirect3DSurface9* cubeFaceSurface)
 		return;
 	}
 
-	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pGround->GetWorldMat(), _pLight->GetViewProjectionMatrix());
+	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pGround->GetWorldMat(), _pLight[0]->GetViewProjectionMatrix());
 	_pShadowEffect->Effect->SetMatrix(_pShadowEffect->WorldMatrixHandle, _pGround->GetWorldMat());
 	_pShadowEffect->Effect->SetMatrix(_pShadowEffect->WorldViewProjMatHandle, &worldViewProjectionMatrix);
 
@@ -183,7 +183,7 @@ void Environment::RenderDepthToCubeFace(IDirect3DSurface9* cubeFaceSurface)
 	_pGround->_pMesh->DrawSubset(0);
 	_pShadowEffect->Effect->EndPass();
 
-	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pTeapot->GetWorldMat(), _pLight->GetViewProjectionMatrix());
+	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pTeapot->GetWorldMat(), _pLight[0]->GetViewProjectionMatrix());
 	_pShadowEffect->Effect->SetMatrix(_pShadowEffect->WorldMatrixHandle, _pTeapot->GetWorldMat());
 	_pShadowEffect->Effect->SetMatrix(_pShadowEffect->WorldViewProjMatHandle, &worldViewProjectionMatrix);
 
@@ -191,7 +191,7 @@ void Environment::RenderDepthToCubeFace(IDirect3DSurface9* cubeFaceSurface)
 	_pTeapot->_pMesh->DrawSubset(0);
 	_pShadowEffect->Effect->EndPass();
 
-	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pSphere->GetWorldMat(), _pLight->GetViewProjectionMatrix());
+	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pSphere->GetWorldMat(), _pLight[0]->GetViewProjectionMatrix());
 	_pShadowEffect->Effect->SetMatrix(_pShadowEffect->WorldMatrixHandle, _pSphere->GetWorldMat());
 	_pShadowEffect->Effect->SetMatrix(_pShadowEffect->WorldViewProjMatHandle, &worldViewProjectionMatrix);
 
@@ -245,7 +245,9 @@ void Environment::RenderSceneWithShadowMap()
 		_pd3dDevice->Clear(NULL, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00000000, 1.0f, NULL);
 	}
 
-	_pShadowEffect->Effect->SetTexture(_pShadowEffect->CubeShadowMapHandle, _pLight->CubicShadowMap);
+	//foreach light put another ShadowMapHandle into the shader?
+	_pShadowEffect->Effect->SetTexture(_pShadowEffect->CubeShadowMapHandle, _pLight[0]->CubicShadowMap);
+	//_pShadowEffect->Effect->SetTexture(_pShadowEffect->CubeShadowMap2Handle, _pLight->CubicShadowMap);
 	_pShadowEffect->Effect->SetTechnique(_pShadowEffect->CubicShadowMappingHandle);
 
 	_pShadowEffect->Effect->Begin(&numOfPasses, NULL);
@@ -268,7 +270,7 @@ void Environment::Render(DWORD inTimeDelta, std::string fps)
 
 	if( SUCCEEDED(_pd3dDevice->BeginScene()) )
 	{
-		FillCubicShadowMap(_pLight);
+		FillCubicShadowMap(_pLight[0]);
 		RenderSceneWithShadowMap();
 
 		_font->DrawText(NULL,
@@ -311,10 +313,11 @@ void Environment::CleanUp()
 		delete _pMainCamera;
 		_pMainCamera = NULL;
 	}
-	if( _pLight != NULL )
+
+	if( _pLight[0] != NULL )
 	{
-		delete _pLight;
-		_pLight = NULL;
+		delete _pLight[0];
+		_pLight[0] = NULL;
 	}
 	if( _pShadowEffect != NULL )
 	{

@@ -8,6 +8,7 @@ void ShadowEffect::GetHandles()
 	WorldMatrixHandle = Effect->GetParameterByName(NULL, "worldMat");
 	WorldViewProjMatHandle = Effect->GetParameterByName(NULL, "worldViewProjMat");
 	CubeShadowMapHandle = Effect->GetParameterByName(NULL, "cubeShadowMap");
+	CubeShadowMap2Handle = Effect->GetParameterByName(NULL, "cubeShadowMap2");
 	EyePositionHandle = Effect->GetParameterByName(NULL, "eyePosition");
 	LightPositionHandle = Effect->GetParameterByName(NULL, "lightPosition");
 	LightNumberHandle = Effect->GetParameterByName(NULL, "lightNumber");
