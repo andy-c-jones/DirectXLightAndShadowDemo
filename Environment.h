@@ -12,9 +12,9 @@ class Environment
 
 	Input* _pInput;
 	PlayerCamera* _pMainCamera;
-	Light* _pLight[1];
+	Light* _pLight[2];
 	ShadowEffect* _pShadowEffect;
-	D3DXVECTOR3 _lightPosition[1];
+	D3DXVECTOR3 _lightPosition[2];
 
 	Mesh* _pTeapot;
 	Mesh* _pSphere;

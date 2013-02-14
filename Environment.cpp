@@ -9,6 +9,8 @@ Environment::Environment(Input* input)
 	_pInput = NULL;  
 	_pMainCamera = NULL;
 	_pLight[0] = NULL;
+	_pLight[1] = NULL;
+
 	_pShadowEffect = NULL;
 
 	_pTeapot = NULL;
@@ -92,7 +94,10 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 
 	D3DXVECTOR3 initialCamPos = D3DXVECTOR3(0.0f, 30.0f, 0.0f);
 
-	_pLight[0] = new Light(_pd3dDevice, &initialCamPos, (D3DX_PI / 2.0f), 1.0f, 1.0f, 500.0f);
+	for(int i = 0; i < 2; i++)
+	{
+		_pLight[i] = new Light(_pd3dDevice, &initialCamPos, (D3DX_PI / 2.0f), 1.0f, 1.0f, 500.0f);
+	}
 
 	_pShadowEffect = new ShadowEffect(&_pd3dDevice, "shadowEffect.fx");
 	if( !(_pShadowEffect->SetUp()) )
@@ -137,6 +142,7 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 	}
 
 	_lightPosition[0] = lightPos;
+	_lightPosition[1] = lightPos;
 
 	return true;
 }
@@ -157,7 +163,10 @@ void Environment::OnFrameMove(DWORD inTimeDelta)
 	_pShadowEffect->Effect->SetVectorArray(_pShadowEffect->LightPositionHandle, &D3DXVECTOR4(_lightPosition[0], 1.0f), 1);
 	_pShadowEffect->Effect->SetInt(_pShadowEffect->LightPositionHandle, lightNumber);
 
-	_pLight[0]->SetPosition(&_lightPosition[0]);
+	for(int i = 0; i < 2; i++)
+	{
+		_pLight[i]->SetPosition(&_lightPosition[i]);
+	}
 	_pLightMesh->Translate(_pLight[0]->GetPosition()->x, _pLight[0]->GetPosition()->y, _pLight[0]->GetPosition()->z);
 
 	_pShadowEffect->Effect->SetVector(_pShadowEffect->EyePositionHandle, _pMainCamera->GetPosition4());
@@ -245,7 +254,6 @@ void Environment::RenderSceneWithShadowMap()
 		_pd3dDevice->Clear(NULL, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00000000, 1.0f, NULL);
 	}
 
-	//foreach light put another ShadowMapHandle into the shader?
 	_pShadowEffect->Effect->SetTexture(_pShadowEffect->CubeShadowMapHandle, _pLight[0]->CubicShadowMap);
 	//_pShadowEffect->Effect->SetTexture(_pShadowEffect->CubeShadowMap2Handle, _pLight->CubicShadowMap);
 	_pShadowEffect->Effect->SetTechnique(_pShadowEffect->CubicShadowMappingHandle);
