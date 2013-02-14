@@ -34,7 +34,7 @@ class Environment
 	void OnFrameMove(DWORD inTimeDelta);
 
 	void RenderDepthToCubeFace(IDirect3DSurface9* cubeFaceSurface);
-	void FillCubicShadowMap();
+	void FillCubicShadowMap(Light* light);
 	void RenderSceneWithShadowMap();
 public:
 	Environment(Input* input);

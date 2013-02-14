@@ -158,7 +158,7 @@ void Environment::OnFrameMove(DWORD inTimeDelta)
 	_pShadowEffect->Effect->SetInt(_pShadowEffect->LightPositionHandle, lightNumber);
 
 	_pLight->SetPosition(&_lightPosition[0]);
-	_pLightMesh->Translate(_lightPosition[0].x, _lightPosition[0].y, _lightPosition[0].z);
+	_pLightMesh->Translate(_pLight->GetPosition()->x, _pLight->GetPosition()->y, _pLight->GetPosition()->z);
 
 	_pShadowEffect->Effect->SetVector(_pShadowEffect->EyePositionHandle, _pMainCamera->GetPosition4());
 }
@@ -200,29 +200,29 @@ void Environment::RenderDepthToCubeFace(IDirect3DSurface9* cubeFaceSurface)
 	_pShadowEffect->Effect->EndPass();
 }
 
-void Environment::FillCubicShadowMap()
+void Environment::FillCubicShadowMap(Light* light)
 {
 	UINT numOfPasses;
 	if( FAILED(_pd3dDevice->SetRenderState(D3DRS_COLORWRITEENABLE , D3DCOLORWRITEENABLE_RED )) )
 	{
 		return;
 	}
-	_pShadowEffect->Effect->SetVector(_pShadowEffect->ShadowPositionHandle, &D3DXVECTOR4(_lightPosition[0], 1.0f));
+	_pShadowEffect->Effect->SetVector(_pShadowEffect->ShadowPositionHandle, light->GetPosition4());
 	_pShadowEffect->Effect->SetTechnique(_pShadowEffect->DepthMapHandle);
 	_pShadowEffect->Effect->Begin(&numOfPasses, NULL);
 
-	_pLight->SetCameraToPositiveX();
-	RenderDepthToCubeFace(_pLight->_depthCubeFacePX);
-	_pLight->SetCameraToPositiveY();
-	RenderDepthToCubeFace(_pLight->_depthCubeFacePY);
-	_pLight->SetCameraToPositiveZ();
-	RenderDepthToCubeFace(_pLight->_depthCubeFacePZ);
-	_pLight->SetCameraToNegativeX();
-	RenderDepthToCubeFace(_pLight->_depthCubeFaceNX);
-	_pLight->SetCameraToNegativeY();
-	RenderDepthToCubeFace(_pLight->_depthCubeFaceNY);
-	_pLight->SetCameraToNegativeZ();
-	RenderDepthToCubeFace(_pLight->_depthCubeFaceNZ);
+	light->SetCameraToPositiveX();
+	RenderDepthToCubeFace(light->_depthCubeFacePX);
+	light->SetCameraToPositiveY();
+	RenderDepthToCubeFace(light->_depthCubeFacePY);
+	light->SetCameraToPositiveZ();
+	RenderDepthToCubeFace(light->_depthCubeFacePZ);
+	light->SetCameraToNegativeX();
+	RenderDepthToCubeFace(light->_depthCubeFaceNX);
+	light->SetCameraToNegativeY();
+	RenderDepthToCubeFace(light->_depthCubeFaceNY);
+	light->SetCameraToNegativeZ();
+	RenderDepthToCubeFace(light->_depthCubeFaceNZ);
 
 	_pShadowEffect->Effect->End();
 
@@ -257,9 +257,9 @@ void Environment::RenderSceneWithShadowMap()
 	_pShadowEffect->Effect->SetTechnique(_pShadowEffect->AmbientHandle);
 
 
-	_pShadowEffect->Effect->Begin(&numOfPasses, NULL);
-	_pLightMesh->RenderAmbient(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
-	_pShadowEffect->Effect->End();
+	//_pShadowEffect->Effect->Begin(&numOfPasses, NULL);
+	//_pLightMesh->RenderAmbient(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
+	//_pShadowEffect->Effect->End();
 }
 
 void Environment::Render(DWORD inTimeDelta, std::string fps)
@@ -268,7 +268,7 @@ void Environment::Render(DWORD inTimeDelta, std::string fps)
 
 	if( SUCCEEDED(_pd3dDevice->BeginScene()) )
 	{
-		FillCubicShadowMap();
+		FillCubicShadowMap(_pLight);
 		RenderSceneWithShadowMap();
 
 		_font->DrawText(NULL,
