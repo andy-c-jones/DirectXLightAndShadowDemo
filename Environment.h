@@ -14,7 +14,7 @@ class Environment
 	PlayerCamera* _pMainCamera;
 	Light* _pLight[2];
 	ShadowEffect* _pShadowEffect;
-	D3DXVECTOR3 _lightPosition[2];
+	D3DXVECTOR4 _lightPosition[2];
 
 	Mesh* _pTeapot;
 	Mesh* _pSphere;
@@ -33,7 +33,7 @@ class Environment
 	
 	void OnFrameMove(DWORD inTimeDelta);
 
-	void RenderDepthToCubeFace(IDirect3DSurface9* cubeFaceSurface);
+	void RenderDepthToCubeFace(Light* light, IDirect3DSurface9* cubeFaceSurface);
 	void FillCubicShadowMap(Light* light);
 	void RenderSceneWithShadowMap();
 public:

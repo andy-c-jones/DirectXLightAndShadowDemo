@@ -13,8 +13,7 @@ const float4 lightSpecular = float4(0.3f, 0.3f, 0.3f, 1.0f);
 const float4 lightAttenuation = float4(0.0f, 0.05f, 0.0f, 1.0f);
 
 const float specPower = 64.0f;
-const static int NUMBER_OF_LIGHTS = 1;
-int lightNumber;
+const static int NUMBER_OF_LIGHTS = 2;
 float4 lightPosition[NUMBER_OF_LIGHTS];
 float4 shadowLightPosition;
 float4 eyePosition;
@@ -55,11 +54,11 @@ lightFuncOutput LightPointSH(float3 inObjPos,
 
 	 for(int i = 0; i < NUMBER_OF_LIGHTS; i++)
 	 {
-		output.diffuseResult[0] = float4(0.0f, 0.0f, 0.0f, 1.0f);
-		output.specularResult[0] = float4(0.0f, 0.0f, 0.0f, 1.0f);
+		output.diffuseResult[i] = float4(0.0f, 0.0f, 0.0f, 1.0f);
+		output.specularResult[i] = float4(0.0f, 0.0f, 0.0f, 1.0f);
 
 		float4 PLightDirection = 0.0f;
-		PLightDirection.xyz = lightPosition[0].xyz - inObjPos;
+		PLightDirection.xyz = lightPosition[i].xyz - inObjPos;
 		float distance = length(PLightDirection.xyz);
 		 PLightDirection.xyz = PLightDirection.xyz / distance;
     
@@ -80,8 +79,8 @@ lightFuncOutput LightPointSH(float3 inObjPos,
 		{
 			float3 floatVecTmp = normalize(inCam2Vertex + PLightDirection.xyz);
 
-			output.diffuseResult[0] = PLightDirection.w * lightDiffuse * max(0, dot(inNormal, PLightDirection.xyz));
-			output.specularResult[0] = PLightDirection.w * lightSpecular * pow(max (0, dot(inNormal, floatVecTmp) ), specPower);
+			output.diffuseResult[i] = PLightDirection.w * lightDiffuse * max(0, dot(inNormal, PLightDirection.xyz));
+			output.specularResult[i] = PLightDirection.w * lightSpecular * pow(max (0, dot(inNormal, floatVecTmp) ), specPower);
 		}     	
 	 }
 
@@ -178,8 +177,8 @@ technique depthMap
 {
     pass P0
     {          
-        VertexShader = compile vs_2_0 depthMap_VS( );
-        PixelShader  = compile ps_2_0 depthMap_PS( ); 
+        VertexShader = compile vs_3_0 depthMap_VS( );
+        PixelShader  = compile ps_3_0 depthMap_PS( ); 
     }
 }
 
@@ -187,8 +186,8 @@ technique cubicShadowMapping
 {
     pass P0
     {          
-        VertexShader = compile vs_2_0 cubicShadowMapping_VS( );
-        PixelShader  = compile ps_2_0 cubicShadowMapping_PS( ); 
+        VertexShader = compile vs_3_0 cubicShadowMapping_VS( );
+        PixelShader  = compile ps_3_0 cubicShadowMapping_PS( ); 
     }
 }
 
@@ -196,7 +195,7 @@ technique ambient
 {
     pass P0
     {          
-        VertexShader = compile vs_2_0 ambient_VS( );
-        PixelShader  = compile ps_2_0 ambient_PS( ); 
+        VertexShader = compile vs_3_0 ambient_VS( );
+        PixelShader  = compile ps_3_0 ambient_PS( ); 
     }
 }

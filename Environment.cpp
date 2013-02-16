@@ -113,7 +113,8 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 	D3DXVECTOR3 teapotPos = D3DXVECTOR3(0.0f, 0.0f, 30.0f);
 	D3DXVECTOR3 spherePos = D3DXVECTOR3(0.0f, 10.0f, 50.0f);
 	D3DXVECTOR3 groundPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	D3DXVECTOR3 lightPos = D3DXVECTOR3(0.0f, 20.0f, 0.0f);
+	D3DXVECTOR4 lightPos = D3DXVECTOR4(0.0f, 20.0f, 0.0f, 1.0f);
+	D3DXVECTOR4 lightPos2 = D3DXVECTOR4(50.0f, 20.0f, 100.0f, 1.0f);
 
 	_pTeapot = new Mesh(_pd3dDevice, teapotPos, "head.x");
 	if( !(_pTeapot->Load()) )
@@ -134,7 +135,7 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 		return false;
 	}
 
-	_pLightMesh = new Mesh(_pd3dDevice, lightPos, "light.x");
+	_pLightMesh = new Mesh(_pd3dDevice, D3DXVECTOR3(lightPos.x,lightPos.y,lightPos.z), "light.x");
 	if( !(_pLightMesh->Load()) )
 	{
 		MessageBoxA(NULL, "loading light mesh failed.", "BOOM!", MB_OK);
@@ -142,7 +143,7 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 	}
 
 	_lightPosition[0] = lightPos;
-	_lightPosition[1] = lightPos;
+	_lightPosition[1] = lightPos2;
 
 	return true;
 }
@@ -158,21 +159,21 @@ void Environment::OnFrameMove(DWORD inTimeDelta)
 	}
 
 	_lightPosition[0].x += _lightMoveSpeed;
-	int lightNumber = 1;
 
-	_pShadowEffect->Effect->SetVectorArray(_pShadowEffect->LightPositionHandle, &D3DXVECTOR4(_lightPosition[0], 1.0f), 1);
-	_pShadowEffect->Effect->SetInt(_pShadowEffect->LightPositionHandle, lightNumber);
+	_lightPosition[1].z += _lightMoveSpeed;
+
+	_pShadowEffect->Effect->SetVectorArray(_pShadowEffect->LightPositionHandle, _lightPosition, 2);
 
 	for(int i = 0; i < 2; i++)
 	{
-		_pLight[i]->SetPosition(&_lightPosition[i]);
+		_pLight[i]->SetPosition(&D3DXVECTOR3(_lightPosition[i].x,_lightPosition[i].y,_lightPosition[i].z));
 	}
 	_pLightMesh->Translate(_pLight[0]->GetPosition()->x, _pLight[0]->GetPosition()->y, _pLight[0]->GetPosition()->z);
 
 	_pShadowEffect->Effect->SetVector(_pShadowEffect->EyePositionHandle, _pMainCamera->GetPosition4());
 }
 
-void Environment::RenderDepthToCubeFace(IDirect3DSurface9* cubeFaceSurface)
+void Environment::RenderDepthToCubeFace(Light* light, IDirect3DSurface9* cubeFaceSurface)
 {
 	D3DXMATRIXA16 worldViewProjectionMatrix;
 	if(SUCCEEDED(_pd3dDevice->SetRenderTarget( 0, cubeFaceSurface )))
@@ -184,7 +185,7 @@ void Environment::RenderDepthToCubeFace(IDirect3DSurface9* cubeFaceSurface)
 		return;
 	}
 
-	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pGround->GetWorldMat(), _pLight[0]->GetViewProjectionMatrix());
+	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pGround->GetWorldMat(), light->GetViewProjectionMatrix());
 	_pShadowEffect->Effect->SetMatrix(_pShadowEffect->WorldMatrixHandle, _pGround->GetWorldMat());
 	_pShadowEffect->Effect->SetMatrix(_pShadowEffect->WorldViewProjMatHandle, &worldViewProjectionMatrix);
 
@@ -192,7 +193,7 @@ void Environment::RenderDepthToCubeFace(IDirect3DSurface9* cubeFaceSurface)
 	_pGround->_pMesh->DrawSubset(0);
 	_pShadowEffect->Effect->EndPass();
 
-	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pTeapot->GetWorldMat(), _pLight[0]->GetViewProjectionMatrix());
+	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pTeapot->GetWorldMat(), light->GetViewProjectionMatrix());
 	_pShadowEffect->Effect->SetMatrix(_pShadowEffect->WorldMatrixHandle, _pTeapot->GetWorldMat());
 	_pShadowEffect->Effect->SetMatrix(_pShadowEffect->WorldViewProjMatHandle, &worldViewProjectionMatrix);
 
@@ -200,7 +201,7 @@ void Environment::RenderDepthToCubeFace(IDirect3DSurface9* cubeFaceSurface)
 	_pTeapot->_pMesh->DrawSubset(0);
 	_pShadowEffect->Effect->EndPass();
 
-	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pSphere->GetWorldMat(), _pLight[0]->GetViewProjectionMatrix());
+	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pSphere->GetWorldMat(), light->GetViewProjectionMatrix());
 	_pShadowEffect->Effect->SetMatrix(_pShadowEffect->WorldMatrixHandle, _pSphere->GetWorldMat());
 	_pShadowEffect->Effect->SetMatrix(_pShadowEffect->WorldViewProjMatHandle, &worldViewProjectionMatrix);
 
@@ -221,17 +222,17 @@ void Environment::FillCubicShadowMap(Light* light)
 	_pShadowEffect->Effect->Begin(&numOfPasses, NULL);
 
 	light->SetCameraToPositiveX();
-	RenderDepthToCubeFace(light->_depthCubeFacePX);
+	RenderDepthToCubeFace(light, light->_depthCubeFacePX);
 	light->SetCameraToPositiveY();
-	RenderDepthToCubeFace(light->_depthCubeFacePY);
+	RenderDepthToCubeFace(light, light->_depthCubeFacePY);
 	light->SetCameraToPositiveZ();
-	RenderDepthToCubeFace(light->_depthCubeFacePZ);
+	RenderDepthToCubeFace(light, light->_depthCubeFacePZ);
 	light->SetCameraToNegativeX();
-	RenderDepthToCubeFace(light->_depthCubeFaceNX);
+	RenderDepthToCubeFace(light, light->_depthCubeFaceNX);
 	light->SetCameraToNegativeY();
-	RenderDepthToCubeFace(light->_depthCubeFaceNY);
+	RenderDepthToCubeFace(light, light->_depthCubeFaceNY);
 	light->SetCameraToNegativeZ();
-	RenderDepthToCubeFace(light->_depthCubeFaceNZ);
+	RenderDepthToCubeFace(light, light->_depthCubeFaceNZ);
 
 	_pShadowEffect->Effect->End();
 
@@ -255,7 +256,7 @@ void Environment::RenderSceneWithShadowMap()
 	}
 
 	_pShadowEffect->Effect->SetTexture(_pShadowEffect->CubeShadowMapHandle, _pLight[0]->CubicShadowMap);
-	//_pShadowEffect->Effect->SetTexture(_pShadowEffect->CubeShadowMap2Handle, _pLight->CubicShadowMap);
+	_pShadowEffect->Effect->SetTexture(_pShadowEffect->CubeShadowMap2Handle, _pLight[1]->CubicShadowMap);
 	_pShadowEffect->Effect->SetTechnique(_pShadowEffect->CubicShadowMappingHandle);
 
 	_pShadowEffect->Effect->Begin(&numOfPasses, NULL);
@@ -278,7 +279,10 @@ void Environment::Render(DWORD inTimeDelta, std::string fps)
 
 	if( SUCCEEDED(_pd3dDevice->BeginScene()) )
 	{
-		FillCubicShadowMap(_pLight[0]);
+		for (int i = 0; i < 2; i++)
+		{
+			FillCubicShadowMap(_pLight[i]);
+		}
 		RenderSceneWithShadowMap();
 
 		_font->DrawText(NULL,
@@ -327,6 +331,13 @@ void Environment::CleanUp()
 		delete _pLight[0];
 		_pLight[0] = NULL;
 	}
+
+	if( _pLight[1] != NULL )
+	{
+		delete _pLight[1];
+		_pLight[1] = NULL;
+	}
+
 	if( _pShadowEffect != NULL )
 	{
 		_pShadowEffect->CleanUp();
