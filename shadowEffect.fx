@@ -8,7 +8,9 @@ const float4 materialDiffuse = float4(1.0f, 1.0f, 1.0f, 1.0f);
 const float4 materialSpecular = float4(1.0f, 1.0f, 1.0f, 1.0f);
 const float4 globalAmbient = float4(1.0f, 1.0f, 1.0f, 1.0f);
 
-const float4 lightDiffuse = float4(0.7f, 0.7f, 0.7f, 1.0f);
+const float4 lightDiffuse = float4(1.0f, 0.7f, 0.7f, 1.0f);
+const float4 lightDiffuse2 = float4(0.7f, 1.0f, 0.7f, 1.0f);
+const float4 lightDiffuse3 = float4(0.7f, 0.7f, 1.0f, 1.0f);
 const float4 lightSpecular = float4(0.3f, 0.3f, 0.3f, 1.0f);
 const float4 lightAttenuation = float4(0.0f, 0.05f, 0.0f, 1.0f);
 
@@ -51,7 +53,10 @@ lightFuncOutput LightPointSH(float3 inObjPos,
 						     float3 inCam2Vertex)
 {
      lightFuncOutput output;
-
+	 float4 colours[3];
+	 colours[0] = lightDiffuse;
+	 colours[1] = lightDiffuse2;
+	 colours[2] = lightDiffuse3;
 	 for(int i = 0; i < NUMBER_OF_LIGHTS; i++)
 	 {
 		output.diffuseResult[i] = float4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -79,7 +84,7 @@ lightFuncOutput LightPointSH(float3 inObjPos,
 		{
 			float3 floatVecTmp = normalize(inCam2Vertex + PLightDirection.xyz);
 
-			output.diffuseResult[i] = PLightDirection.w * lightDiffuse * max(0, dot(inNormal, PLightDirection.xyz));
+			output.diffuseResult[i] = PLightDirection.w * colours[i] * max(0, dot(inNormal, PLightDirection.xyz));
 			output.specularResult[i] = PLightDirection.w * lightSpecular * pow(max (0, dot(inNormal, floatVecTmp) ), specPower);
 		}     	
 	 }

@@ -121,6 +121,7 @@
     <None Include="head.x" />
     <None Include="light.x" />
     <None Include="monkey.x" />
+    <None Include="plane.x" />
     <None Include="sphere.x" />
     <None Include="teapot.x" />
     <None Include="teapot2.x" />

@@ -128,7 +128,7 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 		MessageBoxA(NULL, "loading sphere mesh failed.", "BOOM!", MB_OK);
 		return false;
 	}
-	_pGround = new Mesh(_pd3dDevice, groundPos, "ground.x");
+	_pGround = new Mesh(_pd3dDevice, groundPos, "plane.x");
 	if( !(_pGround->Load()) )
 	{
 		MessageBoxA(NULL, "loading ground mesh failed.", "BOOM!", MB_OK);

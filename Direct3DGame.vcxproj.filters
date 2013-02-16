@@ -74,5 +74,8 @@
     <None Include="head.x">
       <Filter>Data</Filter>
     </None>
+    <None Include="plane.x">
+      <Filter>Data</Filter>
+    </None>
   </ItemGroup>
 </Project>
