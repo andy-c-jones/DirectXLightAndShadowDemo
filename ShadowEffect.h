@@ -14,6 +14,7 @@ public:
 	D3DXHANDLE WorldViewProjMatHandle;
 	D3DXHANDLE CubeShadowMapHandle;
 	D3DXHANDLE CubeShadowMap2Handle;
+	D3DXHANDLE CubeShadowMap3Handle;
 	D3DXHANDLE EyePositionHandle;
 	D3DXHANDLE LightPositionHandle;
 	D3DXHANDLE LightNumberHandle;

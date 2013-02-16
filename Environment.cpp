@@ -10,6 +10,7 @@ Environment::Environment(Input* input)
 	_pMainCamera = NULL;
 	_pLight[0] = NULL;
 	_pLight[1] = NULL;
+	_pLight[2] = NULL;
 
 	_pShadowEffect = NULL;
 
@@ -94,7 +95,7 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 
 	D3DXVECTOR3 initialCamPos = D3DXVECTOR3(0.0f, 30.0f, 0.0f);
 
-	for(int i = 0; i < 2; i++)
+	for(int i = 0; i < 3; i++)
 	{
 		_pLight[i] = new Light(_pd3dDevice, &initialCamPos, (D3DX_PI / 2.0f), 1.0f, 1.0f, 500.0f);
 	}
@@ -115,7 +116,7 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 	D3DXVECTOR3 groundPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	D3DXVECTOR4 lightPos = D3DXVECTOR4(0.0f, 20.0f, 0.0f, 1.0f);
 	D3DXVECTOR4 lightPos2 = D3DXVECTOR4(50.0f, 20.0f, 100.0f, 1.0f);
-
+	D3DXVECTOR4 lightPos3 = D3DXVECTOR4(-150.0f, 20.0f, 0.0f, 1.0f);
 	_pTeapot = new Mesh(_pd3dDevice, teapotPos, "head.x");
 	if( !(_pTeapot->Load()) )
 	{
@@ -144,6 +145,7 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 
 	_lightPosition[0] = lightPos;
 	_lightPosition[1] = lightPos2;
+	_lightPosition[2] = lightPos3;
 
 	return true;
 }
@@ -162,9 +164,12 @@ void Environment::OnFrameMove(DWORD inTimeDelta)
 
 	_lightPosition[1].z += _lightMoveSpeed;
 
-	_pShadowEffect->Effect->SetVectorArray(_pShadowEffect->LightPositionHandle, _lightPosition, 2);
+	_lightPosition[2].x += _lightMoveSpeed;
+	_lightPosition[2].z += _lightMoveSpeed;
 
-	for(int i = 0; i < 2; i++)
+	_pShadowEffect->Effect->SetVectorArray(_pShadowEffect->LightPositionHandle, _lightPosition, 3);
+
+	for(int i = 0; i < 3; i++)
 	{
 		_pLight[i]->SetPosition(&D3DXVECTOR3(_lightPosition[i].x,_lightPosition[i].y,_lightPosition[i].z));
 	}
@@ -257,6 +262,7 @@ void Environment::RenderSceneWithShadowMap()
 
 	_pShadowEffect->Effect->SetTexture(_pShadowEffect->CubeShadowMapHandle, _pLight[0]->CubicShadowMap);
 	_pShadowEffect->Effect->SetTexture(_pShadowEffect->CubeShadowMap2Handle, _pLight[1]->CubicShadowMap);
+	_pShadowEffect->Effect->SetTexture(_pShadowEffect->CubeShadowMap3Handle, _pLight[2]->CubicShadowMap);
 	_pShadowEffect->Effect->SetTechnique(_pShadowEffect->CubicShadowMappingHandle);
 
 	_pShadowEffect->Effect->Begin(&numOfPasses, NULL);
@@ -279,7 +285,7 @@ void Environment::Render(DWORD inTimeDelta, std::string fps)
 
 	if( SUCCEEDED(_pd3dDevice->BeginScene()) )
 	{
-		for (int i = 0; i < 2; i++)
+		for (int i = 0; i < 3; i++)
 		{
 			FillCubicShadowMap(_pLight[i]);
 		}
@@ -336,6 +342,11 @@ void Environment::CleanUp()
 	{
 		delete _pLight[1];
 		_pLight[1] = NULL;
+	}
+	if( _pLight[2] != NULL )
+	{
+		delete _pLight[2];
+		_pLight[2] = NULL;
 	}
 
 	if( _pShadowEffect != NULL )

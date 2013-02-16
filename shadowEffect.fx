@@ -2,6 +2,7 @@ float4x4 worldMat;
 float4x4 worldViewProjMat;
 textureCUBE cubeShadowMap; 
 textureCUBE cubeShadowMap2; 
+textureCUBE cubeShadowMap3; 
 
 const float4 materialAmbient = float4(0.9f, 0.9f, 0.9f, 1.0f);  
 const float4 materialDiffuse = float4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -15,7 +16,7 @@ const float4 lightSpecular = float4(0.3f, 0.3f, 0.3f, 1.0f);
 const float4 lightAttenuation = float4(0.0f, 0.05f, 0.0f, 1.0f);
 
 const float specPower = 64.0f;
-const static int NUMBER_OF_LIGHTS = 2;
+const static int NUMBER_OF_LIGHTS = 3;
 float4 lightPosition[NUMBER_OF_LIGHTS];
 float4 shadowLightPosition;
 float4 eyePosition;
@@ -42,15 +43,25 @@ samplerCUBE cubeShadowMapSampler2 = sampler_state
     AddressV = wrap;
 };
 
+samplerCUBE cubeShadowMapSampler3 = sampler_state
+{
+	Texture = <cubeShadowMap3>;
+    MipFilter = NONE;
+    MinFilter = NONE;
+    MagFilter = NONE;
+    AddressU = wrap;
+    AddressV = wrap;
+};
+
 struct lightFuncOutput
 {
     float4 diffuseResult[NUMBER_OF_LIGHTS];
     float4 specularResult[NUMBER_OF_LIGHTS];
 };
 
-lightFuncOutput LightPointSH(float3 inObjPos, 
-						     float3 inNormal, 
-						     float3 inCam2Vertex)
+lightFuncOutput LightPointSH(float3 objectPosition, 
+						     float3 normal, 
+						     float3 camToVertex)
 {
      lightFuncOutput output;
 	 float4 colours[3];
@@ -63,7 +74,7 @@ lightFuncOutput LightPointSH(float3 inObjPos,
 		output.specularResult[i] = float4(0.0f, 0.0f, 0.0f, 1.0f);
 
 		float4 PLightDirection = 0.0f;
-		PLightDirection.xyz = lightPosition[i].xyz - inObjPos;
+		PLightDirection.xyz = lightPosition[i].xyz - objectPosition;
 		float distance = length(PLightDirection.xyz);
 		 PLightDirection.xyz = PLightDirection.xyz / distance;
     
@@ -75,17 +86,21 @@ lightFuncOutput LightPointSH(float3 inObjPos,
 		{
 			shadowMapDepth = texCUBE(cubeShadowMapSampler, float4(-(PLightDirection.xyz), 0.0f)).x;
 		}
-		else
+		if(i == 1)
 		{
 			shadowMapDepth = texCUBE(cubeShadowMapSampler2, float4(-(PLightDirection.xyz), 0.0f)).x;
+		}
+		if(i == 2)
+		{
+			shadowMapDepth = texCUBE(cubeShadowMapSampler3, float4(-(PLightDirection.xyz), 0.0f)).x;
 		}
 	 
 		if(distance <= shadowMapDepth)    
 		{
-			float3 floatVecTmp = normalize(inCam2Vertex + PLightDirection.xyz);
+			float3 floatVecTmp = normalize(camToVertex + PLightDirection.xyz);
 
-			output.diffuseResult[i] = PLightDirection.w * colours[i] * max(0, dot(inNormal, PLightDirection.xyz));
-			output.specularResult[i] = PLightDirection.w * lightSpecular * pow(max (0, dot(inNormal, floatVecTmp) ), specPower);
+			output.diffuseResult[i] = PLightDirection.w * colours[i] * max(0, dot(normal, PLightDirection.xyz));
+			output.specularResult[i] = PLightDirection.w * lightSpecular * pow(max (0, dot(normal, floatVecTmp) ), specPower);
 		}     	
 	 }
 
@@ -162,9 +177,9 @@ float4 cubicShadowMapping_PS(VS_OUTPUT In) : COLOR0
 
 	float4 specular = float4(0,0,0,0);
 	float4 tempSpecular = float4(0,0,0,0);
-	for(int i = 0; i < NUMBER_OF_LIGHTS; i++)
+	for(int j = 0; j < NUMBER_OF_LIGHTS; j++)
 	{
-		tempSpecular = materialSpecular * lightResult.specularResult[i];
+		tempSpecular = materialSpecular * lightResult.specularResult[j];
 		specular += tempSpecular / NUMBER_OF_LIGHTS;
 	}
 
