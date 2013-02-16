@@ -56,9 +56,6 @@
     <None Include="ground.x">
       <Filter>Data</Filter>
     </None>
-    <None Include="light.x">
-      <Filter>Data</Filter>
-    </None>
     <None Include="sphere.x">
       <Filter>Data</Filter>
     </None>

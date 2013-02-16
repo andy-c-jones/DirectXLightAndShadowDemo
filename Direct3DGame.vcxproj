@@ -119,7 +119,6 @@
   <ItemGroup>
     <None Include="ground.x" />
     <None Include="head.x" />
-    <None Include="light.x" />
     <None Include="monkey.x" />
     <None Include="plane.x" />
     <None Include="sphere.x" />

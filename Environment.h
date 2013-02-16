@@ -19,9 +19,6 @@ class Environment
 	Mesh* _pTeapot;
 	Mesh* _pSphere;
 	Mesh* _pGround;
-	Mesh* _pLightMesh;
-
-
 
 	LPD3DXFONT _font; 
 	D3DXFONT_DESC _fontDesc;

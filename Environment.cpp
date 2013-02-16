@@ -17,7 +17,6 @@ Environment::Environment(Input* input)
 	_pTeapot = NULL;
 	_pSphere = NULL;
 	_pGround = NULL;
-	_pLightMesh = NULL;
 
 	_lightMoveSpeed = 0.01f;
 	_font = NULL;
@@ -52,9 +51,8 @@ bool Environment::InitialiseDirectX( HWND hWnd, UINT screenWidth, UINT screenHei
 	d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
 	d3dpp.EnableAutoDepthStencil = true;
 	d3dpp.AutoDepthStencilFormat = D3DFMT_D24X8;
-	d3dpp.SwapEffect = D3DSWAPEFFECT_FLIP;
+	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;//D3DSWAPEFFECT_FLIP;
 	d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
-
 	int VP = 0;
 	D3DCAPS9 caps;
 	_pD3D->GetDeviceCaps(AdapterToUse, DeviceType, &caps);
@@ -77,7 +75,6 @@ bool Environment::InitialiseDirectX( HWND hWnd, UINT screenWidth, UINT screenHei
 		MessageBox(hWnd,"Failed To Create Device","BOOM!",MB_OK);
 		return false;
 	}
-
 	_pd3dDevice->GetRenderTarget(0, &_pBackBufferSurface);
 
 	return true;
@@ -116,8 +113,8 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 	D3DXVECTOR3 groundPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	D3DXVECTOR4 lightPos = D3DXVECTOR4(0.0f, 20.0f, 0.0f, 1.0f);
 	D3DXVECTOR4 lightPos2 = D3DXVECTOR4(50.0f, 20.0f, 100.0f, 1.0f);
-	D3DXVECTOR4 lightPos3 = D3DXVECTOR4(-150.0f, 20.0f, 0.0f, 1.0f);
-	_pTeapot = new Mesh(_pd3dDevice, teapotPos, "head.x");
+	D3DXVECTOR4 lightPos3 = D3DXVECTOR4(-100.0f, 20.0f, 0.0f, 1.0f);
+	_pTeapot = new Mesh(_pd3dDevice, teapotPos, "teapot.x");
 	if( !(_pTeapot->Load()) )
 	{
 		MessageBoxA(NULL, "loading teapot mesh failed.", "BOOM!", MB_OK);
@@ -133,13 +130,6 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 	if( !(_pGround->Load()) )
 	{
 		MessageBoxA(NULL, "loading ground mesh failed.", "BOOM!", MB_OK);
-		return false;
-	}
-
-	_pLightMesh = new Mesh(_pd3dDevice, D3DXVECTOR3(lightPos.x,lightPos.y,lightPos.z), "light.x");
-	if( !(_pLightMesh->Load()) )
-	{
-		MessageBoxA(NULL, "loading light mesh failed.", "BOOM!", MB_OK);
 		return false;
 	}
 
@@ -173,7 +163,6 @@ void Environment::OnFrameMove(DWORD inTimeDelta)
 	{
 		_pLight[i]->SetPosition(&D3DXVECTOR3(_lightPosition[i].x,_lightPosition[i].y,_lightPosition[i].z));
 	}
-	_pLightMesh->Translate(_pLight[0]->GetPosition()->x, _pLight[0]->GetPosition()->y, _pLight[0]->GetPosition()->z);
 
 	_pShadowEffect->Effect->SetVector(_pShadowEffect->EyePositionHandle, _pMainCamera->GetPosition4());
 }
@@ -259,6 +248,8 @@ void Environment::RenderSceneWithShadowMap()
 	{
 		_pd3dDevice->Clear(NULL, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00000000, 1.0f, NULL);
 	}
+	_pd3dDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);   
+
 
 	_pShadowEffect->Effect->SetTexture(_pShadowEffect->CubeShadowMapHandle, _pLight[0]->CubicShadowMap);
 	_pShadowEffect->Effect->SetTexture(_pShadowEffect->CubeShadowMap2Handle, _pLight[1]->CubicShadowMap);
@@ -272,11 +263,6 @@ void Environment::RenderSceneWithShadowMap()
 	_pShadowEffect->Effect->End();
 
 	_pShadowEffect->Effect->SetTechnique(_pShadowEffect->AmbientHandle);
-
-
-	//_pShadowEffect->Effect->Begin(&numOfPasses, NULL);
-	//_pLightMesh->RenderAmbient(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
-	//_pShadowEffect->Effect->End();
 }
 
 void Environment::Render(DWORD inTimeDelta, std::string fps)
@@ -373,12 +359,6 @@ void Environment::CleanUp()
 		_pGround->CleanUp();
 		delete _pGround;
 		_pGround = NULL;
-	}
-	if( _pLightMesh != NULL )
-	{
-		_pLightMesh->CleanUp();
-		delete _pLightMesh;
-		_pLightMesh = NULL;
 	}
 	if(_font != NULL)
 	{
