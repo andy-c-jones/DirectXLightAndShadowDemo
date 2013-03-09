@@ -17,6 +17,7 @@ Environment::Environment(Input* input)
 	_pTeapot = NULL;
 	_pSphere = NULL;
 	_pGround = NULL;
+	_pCeiling = NULL;
 
 	_lightMoveSpeed = 0.01f;
 	_font = NULL;
@@ -90,7 +91,7 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 
 	D3DXCreateFontIndirect(_pd3dDevice,&_fontDesc,&_font);
 
-	D3DXVECTOR3 initialCamPos = D3DXVECTOR3(0.0f, 30.0f, 0.0f);
+	D3DXVECTOR3 initialCamPos = D3DXVECTOR3(0.0f, 20.0f, 0.0f);
 
 	for(int i = 0; i < 3; i++)
 	{
@@ -109,8 +110,11 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 
 
 	D3DXVECTOR3 teapotPos = D3DXVECTOR3(0.0f, 0.0f, 30.0f);
-	D3DXVECTOR3 spherePos = D3DXVECTOR3(0.0f, 10.0f, 50.0f);
+	D3DXVECTOR3 spherePos = D3DXVECTOR3(0.0f, 40.0f, 50.0f);
 	D3DXVECTOR3 groundPos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	D3DXVECTOR3 ceilingPos = D3DXVECTOR3(0.0f, 70.0f, 0.0f);
+	D3DXVECTOR3 wallPos = D3DXVECTOR3(30.0f, 10.0f, 50.0f);
+
 	D3DXVECTOR4 lightPos = D3DXVECTOR4(0.0f, 20.0f, 0.0f, 1.0f);
 	D3DXVECTOR4 lightPos2 = D3DXVECTOR4(50.0f, 20.0f, 100.0f, 1.0f);
 	D3DXVECTOR4 lightPos3 = D3DXVECTOR4(-100.0f, 20.0f, 0.0f, 1.0f);
@@ -126,12 +130,27 @@ bool Environment::Initialise( HWND hWnd, HINSTANCE instance, UINT screenWidth, U
 		MessageBoxA(NULL, "loading sphere mesh failed.", "BOOM!", MB_OK);
 		return false;
 	}
+	_pCeiling = new Mesh(_pd3dDevice, ceilingPos, "roof.x");
+	if( !(_pCeiling->Load()) )
+	{
+		MessageBoxA(NULL, "loading ceiling mesh failed.", "BOOM!", MB_OK);
+		return false;
+	}
+
 	_pGround = new Mesh(_pd3dDevice, groundPos, "plane.x");
 	if( !(_pGround->Load()) )
 	{
 		MessageBoxA(NULL, "loading ground mesh failed.", "BOOM!", MB_OK);
 		return false;
 	}
+
+	_pWall = new Mesh(_pd3dDevice, wallPos, "Wall1.x");
+	if( !(_pWall->Load()) )
+	{
+		MessageBoxA(NULL, "loading ground mesh failed.", "BOOM!", MB_OK);
+		return false;
+	}
+
 
 	_lightPosition[0] = lightPos;
 	_lightPosition[1] = lightPos2;
@@ -178,6 +197,22 @@ void Environment::RenderDepthToCubeFace(Light* light, IDirect3DSurface9* cubeFac
 	{
 		return;
 	}
+
+	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pCeiling->GetWorldMat(), light->GetViewProjectionMatrix());
+	_pShadowEffect->Effect->SetMatrix(_pShadowEffect->WorldMatrixHandle, _pCeiling->GetWorldMat());
+	_pShadowEffect->Effect->SetMatrix(_pShadowEffect->WorldViewProjMatHandle, &worldViewProjectionMatrix);
+
+	_pShadowEffect->Effect->BeginPass(0);
+	_pCeiling->_pMesh->DrawSubset(0);
+	_pShadowEffect->Effect->EndPass();
+
+	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pWall->GetWorldMat(), light->GetViewProjectionMatrix());
+	_pShadowEffect->Effect->SetMatrix(_pShadowEffect->WorldMatrixHandle, _pWall->GetWorldMat());
+	_pShadowEffect->Effect->SetMatrix(_pShadowEffect->WorldViewProjMatHandle, &worldViewProjectionMatrix);
+
+	_pShadowEffect->Effect->BeginPass(0);
+	_pWall->_pMesh->DrawSubset(0);
+	_pShadowEffect->Effect->EndPass();
 
 	D3DXMatrixMultiply(&worldViewProjectionMatrix, _pGround->GetWorldMat(), light->GetViewProjectionMatrix());
 	_pShadowEffect->Effect->SetMatrix(_pShadowEffect->WorldMatrixHandle, _pGround->GetWorldMat());
@@ -259,7 +294,9 @@ void Environment::RenderSceneWithShadowMap()
 	_pShadowEffect->Effect->Begin(&numOfPasses, NULL);
 	_pSphere->RenderMeshWithShadowCube(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
 	_pTeapot->RenderMeshWithShadowCube(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
+	_pCeiling->RenderMeshWithShadowCube(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
 	_pGround->RenderMeshWithShadowCube(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
+	_pWall->RenderMeshWithShadowCube(_pMainCamera->GetViewProjectionMatrix(), _pShadowEffect);
 	_pShadowEffect->Effect->End();
 
 	_pShadowEffect->Effect->SetTechnique(_pShadowEffect->AmbientHandle);
@@ -359,6 +396,18 @@ void Environment::CleanUp()
 		_pGround->CleanUp();
 		delete _pGround;
 		_pGround = NULL;
+	}
+	if( _pWall != NULL )
+	{
+		_pWall->CleanUp();
+		delete _pWall;
+		_pWall = NULL;
+	}
+	if( _pCeiling != NULL )
+	{
+		_pCeiling->CleanUp();
+		delete _pCeiling;
+		_pCeiling = NULL;
 	}
 	if(_font != NULL)
 	{

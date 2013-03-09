@@ -119,11 +119,12 @@
   <ItemGroup>
     <None Include="ground.x" />
     <None Include="head.x" />
-    <None Include="monkey.x" />
     <None Include="plane.x" />
+    <None Include="roof.x" />
     <None Include="sphere.x" />
     <None Include="teapot.x" />
-    <None Include="teapot2.x" />
+    <None Include="Wall1.x" />
+    <None Include="Wall2.x" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -26,9 +26,9 @@ float4 eyePosition;
 samplerCUBE cubeShadowMapSampler = sampler_state
 {
 	Texture = <cubeShadowMap>;
-    MipFilter = NONE;
-    MinFilter = NONE;
-    MagFilter = NONE;
+    MipFilter = LINEAR;
+    MinFilter = LINEAR;
+    MagFilter = LINEAR;
     AddressU = wrap;
     AddressV = wrap;
 };
@@ -36,9 +36,9 @@ samplerCUBE cubeShadowMapSampler = sampler_state
 samplerCUBE cubeShadowMapSampler2 = sampler_state
 {
 	Texture = <cubeShadowMap2>;
-    MipFilter = NONE;
-    MinFilter = NONE;
-    MagFilter = NONE;
+    MipFilter = LINEAR;
+    MinFilter = LINEAR;
+    MagFilter = LINEAR;
     AddressU = wrap;
     AddressV = wrap;
 };
@@ -46,9 +46,9 @@ samplerCUBE cubeShadowMapSampler2 = sampler_state
 samplerCUBE cubeShadowMapSampler3 = sampler_state
 {
 	Texture = <cubeShadowMap3>;
-    MipFilter = NONE;
-    MinFilter = NONE;
-    MagFilter = NONE;
+    MipFilter = LINEAR;
+    MinFilter = LINEAR;
+    MagFilter = LINEAR;
     AddressU = wrap;
     AddressV = wrap;
 };

@@ -19,6 +19,8 @@ class Environment
 	Mesh* _pTeapot;
 	Mesh* _pSphere;
 	Mesh* _pGround;
+	Mesh* _pCeiling;
+	Mesh* _pWall;
 
 	LPD3DXFONT _font; 
 	D3DXFONT_DESC _fontDesc;
@@ -26,9 +28,9 @@ class Environment
 
 	float _lightMoveSpeed;
 
-	bool InitialiseDirectX(HWND hWnd, UINT inScreenWidth, UINT inScreenHeight, BOOL inWindowed);
+	bool InitialiseDirectX(HWND hWnd, UINT screenWidth, UINT screenHeight, BOOL windowed);
 	
-	void OnFrameMove(DWORD inTimeDelta);
+	void OnFrameMove(DWORD timeDelta);
 
 	void RenderDepthToCubeFace(Light* light, IDirect3DSurface9* cubeFaceSurface);
 	void FillCubicShadowMap(Light* light);
@@ -37,7 +39,7 @@ public:
 	Environment(Input* input);
 	~Environment();
 
-	bool Initialise(HWND hWnd, HINSTANCE inInstance, UINT inScreenWidth, UINT inScreenHeight, BOOL inWindowed);
-	void Render(DWORD inTimeDelta, std::string fps);
+	bool Initialise(HWND hWnd, HINSTANCE instance, UINT screenWidth, UINT screenHeight, BOOL windowed);
+	void Render(DWORD timeDelta, std::string fps);
 	void CleanUp();
 };

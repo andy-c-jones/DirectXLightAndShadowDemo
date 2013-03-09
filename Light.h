@@ -14,10 +14,10 @@ public:
 		_depthCubeFaceNY = NULL;
 		_depthCubeFaceNZ = NULL;
 
-		if( FAILED(D3DXCreateCubeTexture(d3device, 512, 1, D3DUSAGE_RENDERTARGET, 
+		if( FAILED(D3DXCreateCubeTexture(d3device, 720, 1, D3DUSAGE_RENDERTARGET, 
 			D3DFMT_R32F, D3DPOOL_DEFAULT,&CubicShadowMap)) )
 		{
-			if( FAILED(D3DXCreateCubeTexture(d3device, 512, 1, D3DUSAGE_RENDERTARGET, 
+			if( FAILED(D3DXCreateCubeTexture(d3device, 720, 1, D3DUSAGE_RENDERTARGET, 
 				D3DFMT_R16F, D3DPOOL_DEFAULT, &CubicShadowMap)) )
 			{
 				MessageBoxA(NULL, "Creating cubic shadow map failed.", "BOOM!", MB_OK);
